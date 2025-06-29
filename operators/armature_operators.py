@@ -52,6 +52,26 @@ class A1_FS_OT_Copy_Pose_Relations(bpy.types.Operator):
             cls.poll_message_set("")
         return not False
 
+    def _copy_pose_relations(self, armature, source_pose_bones):
+        target_pose_bones = armature.pose.bones
+
+        for source_bone in source_pose_bones:
+            if source_bone.name in target_pose_bones:
+                target_bone = target_pose_bones[source_bone.name]
+
+                target_bone.bone.use_relative_parent = source_pose_bones[
+                    source_bone.name
+                ].bone.use_relative_parent
+                target_bone.bone.use_local_location = source_pose_bones[
+                    source_bone.name
+                ].bone.use_local_location
+                target_bone.bone.use_inherit_rotation = source_pose_bones[
+                    source_bone.name
+                ].bone.use_inherit_rotation
+                target_bone.bone.inherit_scale = source_pose_bones[
+                    source_bone.name
+                ].bone.inherit_scale
+
     def execute(self, context):
         source_armature = bpy.context.scene.a1_fs_armature_source
 
@@ -67,24 +87,7 @@ class A1_FS_OT_Copy_Pose_Relations(bpy.types.Operator):
             if target_armature == source_armature:
                 continue
 
-            target_pose_bones = target_armature.pose.bones
-
-            for source_bone in source_pose_bones:
-                if source_bone.name in target_pose_bones:
-                    target_bone = target_pose_bones[source_bone.name]
-
-                    target_bone.bone.use_relative_parent = source_pose_bones[
-                        source_bone.name
-                    ].bone.use_relative_parent
-                    target_bone.bone.use_local_location = source_pose_bones[
-                        source_bone.name
-                    ].bone.use_local_location
-                    target_bone.bone.use_inherit_rotation = source_pose_bones[
-                        source_bone.name
-                    ].bone.use_inherit_rotation
-                    target_bone.bone.inherit_scale = source_pose_bones[
-                        source_bone.name
-                    ].bone.inherit_scale
+            self._copy_pose_relations(target_armature, source_pose_bones)
 
         return {"FINISHED"}
 
@@ -104,6 +107,14 @@ class A1_FS_OT_Copy_Pose_Transforms(bpy.types.Operator):
             cls.poll_message_set("")
         return not False
 
+    def _copy_pose_transforms(self, armature, source_pose_bones):
+        target_pose_bones = armature.pose.bones
+
+        for source_bone in source_pose_bones:
+            if source_bone.name in target_pose_bones:
+                target_bone = target_pose_bones[source_bone.name]
+                target_bone.matrix_basis = source_bone.matrix_basis.copy()
+
     def execute(self, context):
         source_armature = context.scene.a1_fs_armature_source
 
@@ -119,12 +130,7 @@ class A1_FS_OT_Copy_Pose_Transforms(bpy.types.Operator):
             if target_armature == source_armature:
                 continue
 
-            target_pose_bones = target_armature.pose.bones
-
-            for source_bone in source_pose_bones:
-                if source_bone.name in target_pose_bones:
-                    target_bone = target_pose_bones[source_bone.name]
-                    target_bone.matrix_basis = source_bone.matrix_basis.copy()
+            self._copy_pose_transforms(target_armature, source_pose_bones)
 
         return {"FINISHED"}
 
@@ -146,13 +152,17 @@ class A1_FS_OT_Clear_Pose_Transforms(bpy.types.Operator):
 
     def execute(self, context):
         selection = bpy.context.selected_objects
+        initial_active_object = context.active_object
 
         for obj in selection:
             if obj.type == "ARMATURE":
+                context.view_layer.objects.active = obj
                 bpy.ops.object.mode_set(mode="POSE")
                 bpy.ops.pose.select_all(action="SELECT")
                 bpy.ops.pose.transforms_clear()
                 bpy.ops.object.mode_set(mode="OBJECT")
+
+        context.view_layer.objects.active = initial_active_object
 
         return {"FINISHED"}
 
@@ -214,18 +224,14 @@ class A1_FS_OT_ARMATURE_SAVE_AS_SHAPEKEY(bpy.types.Operator):
         return True
 
     def _process_all_objects(self, context, shapekey_name):
+        target_objects = []
+
         if self.use_selection:
             target_objects = context.selected_objects
         else:
-            active_obj = context.active_object
-            if not active_obj:
-                show_message_box("No active object selected.")
-                return {"CANCELLED"}
-            if active_obj.type != "ARMATURE":
-                show_message_box("Active object must be an armature.")
-                return {"CANCELLED"}
-
-            target_objects = active_obj.children
+            for armature in context.selected_objects:
+                if armature.type == "ARMATURE":
+                    target_objects.extend(armature.children)
 
         for obj in target_objects:
             if obj.type != "MESH":
@@ -239,8 +245,7 @@ class A1_FS_OT_ARMATURE_SAVE_AS_SHAPEKEY(bpy.types.Operator):
         selected_objects = [obj for obj in context.selected_objects]
 
         if shapekey_name == "":
-            show_message_box("Shapekey Name was not set.")
-            return {"CANCELLED"}
+            context.scene.a1_fs_armature_source.name
 
         if self._check_for_existing_shapekeys(context, shapekey_name):
             OverwriteWarnOperator.register_with_callback(
