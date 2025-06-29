@@ -1,0 +1,37 @@
+name: FlexShape Release
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        
+    - name: Get version
+      id: version
+      run: |
+        latest=$(git tag -l "v1.*" | sort -V | tail -n1)
+        if [ -z "$latest" ]; then
+          echo "tag=v1.1" >> $GITHUB_OUTPUT
+        else
+          minor=$(echo $latest | sed 's/v1\.//')
+          echo "tag=v1.$((minor + 1))" >> $GITHUB_OUTPUT
+        fi
+        
+    - uses: thedoctor0/zip-release@0.7.5
+      with:
+        filename: FlexShape-${{ steps.version.outputs.tag }}.zip
+        exclusions: '*.git* node_modules/* .github/*'
+        
+    - uses: ncipollo/release-action@v1.12.0
+      with:
+        tag: ${{ steps.version.outputs.tag }}
+        name: FlexShape ${{ steps.version.outputs.tag }}
+        artifacts: FlexShape-${{ steps.version.outputs.tag }}.zip
