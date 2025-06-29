@@ -178,6 +178,8 @@ class A1_FS_OT_LATTICE_SAVE_AS_SHAPEKEY(bpy.types.Operator):
                     bpy.ops.object.modifier_apply_as_shapekey(
                         modifier=modifier.name, keep_modifier=not remove_lattice
                     )
+                    if not remove_lattice:
+                        modifier.name = "A1ST_LATTICE"
 
         return True
 
@@ -193,8 +195,7 @@ class A1_FS_OT_LATTICE_SAVE_AS_SHAPEKEY(bpy.types.Operator):
         remove_lattice = context.scene.a1_fs_lattice_auto_remove
 
         if shapekey_name == "":
-            show_message_box("Shapekey Name was not set.")
-            return {"CANCELLED"}
+            shapekey_name = context.scene.a1_fs_lattice_source.name
 
         if self._check_for_existing_shapekeys(context, shapekey_name):
             OverwriteWarnOperator.register_with_callback(

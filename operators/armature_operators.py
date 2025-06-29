@@ -152,7 +152,7 @@ class A1_FS_OT_Clear_Pose_Transforms(bpy.types.Operator):
 
     def execute(self, context):
         selection = bpy.context.selected_objects
-        initial_active_object = context.active_object
+        original_active = context.active_object
 
         for obj in selection:
             if obj.type == "ARMATURE":
@@ -162,7 +162,7 @@ class A1_FS_OT_Clear_Pose_Transforms(bpy.types.Operator):
                 bpy.ops.pose.transforms_clear()
                 bpy.ops.object.mode_set(mode="OBJECT")
 
-        context.view_layer.objects.active = initial_active_object
+        context.view_layer.objects.active = original_active
 
         return {"FINISHED"}
 
@@ -245,7 +245,7 @@ class A1_FS_OT_ARMATURE_SAVE_AS_SHAPEKEY(bpy.types.Operator):
         selected_objects = [obj for obj in context.selected_objects]
 
         if shapekey_name == "":
-            context.scene.a1_fs_armature_source.name
+            shapekey_name = context.scene.a1_fs_armature_source.name
 
         if self._check_for_existing_shapekeys(context, shapekey_name):
             OverwriteWarnOperator.register_with_callback(
