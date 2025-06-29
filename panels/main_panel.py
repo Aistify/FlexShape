@@ -3,7 +3,8 @@ from .armature_panel import A1_FS_PT_ARMATURE_PANEL
 from .lattice_panel import A1_FS_PT_LATTICE_PANEL
 from .surface_deform_panel import A1_FS_PT_SURFACE_DEFORM_PANEL
 from .utils_panel import A1_FS_PT_UTILS_PANEL
-from .blendshape_utils_panel import A1_FS_PT_BLENDSHAPE_UTILS_PANEL
+
+# from .blendshape_utils_panel import A1_FS_PT_BLENDSHAPE_UTILS_PANEL
 
 
 class A1_FS_PT_MAIN_PANEL(bpy.types.Panel):
@@ -13,6 +14,7 @@ class A1_FS_PT_MAIN_PANEL(bpy.types.Panel):
     bl_region_type = "UI"
     bl_category = "FlexShape"
 
+    # noinspection PyUnusedLocal
     @classmethod
     def poll(cls, context):
         return True

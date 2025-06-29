@@ -7,6 +7,7 @@ class A1_FS_PT_UTILS_PANEL(bpy.types.Panel):
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
 
+    # noinspection PyUnusedLocal
     @classmethod
     def poll(cls, context):
         return False

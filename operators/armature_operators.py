@@ -1,46 +1,11 @@
 ﻿import bpy
 from ..common.functions import show_message_box
+from ..common.functions import remove_duplicate_shapekey
+from ..common.functions import OverwriteWarnOperator
 
 
-class OverwriteWarnOperator(bpy.types.Operator):
-    bl_idname = "a1_fs.overwrite_dialogue"
-    bl_label = "Overwrite Confirmation"
-    bl_options = {"INTERNAL"}
-
-    choice: bpy.props.EnumProperty(
-        items=[("YES", "Yes", "Overwrite"), ("NO", "No", "Skip")], default="NO"
-    )
-
-    callback_fn = None
-
-    @classmethod
-    def register_with_callback(cls, callback):
-        cls.callback_fn = staticmethod(callback)
-        bpy.utils.register_class(cls)
-
-    def execute(self, context):
-        if self.choice == "YES" and self.callback_fn:
-            self.callback_fn(context)
-        else:
-            print("User clicked 'No'")
-
-        bpy.utils.unregister_class(self.__class__)
-        return {"FINISHED"}
-
-    def invoke(self, context, event):
-        return context.window_manager.invoke_props_dialog(self)
-
-    def draw(self, context):
-        layout = self.layout
-        layout.label(text="Shapekeys will be overwritten. Continue?")
-        layout.prop(self, "choice", expand=True)
-
-    def cancel(self, context):
-        print("Dialog cancelled")
-        bpy.utils.unregister_class(self.__class__)
-
-
-class A1_FS_OT_Copy_Pose_Relations(bpy.types.Operator):
+# noinspection PyMethodMayBeStatic,PyUnusedLocal
+class A1_FS_OT_COPY_POSE_RELATIONS(bpy.types.Operator):
     bl_idname = "a1_fs.copy_pose_relations"
     bl_label = "copy_pose_relations"
     bl_description = ""
@@ -95,7 +60,8 @@ class A1_FS_OT_Copy_Pose_Relations(bpy.types.Operator):
         return self.execute(context)
 
 
-class A1_FS_OT_Copy_Pose_Transforms(bpy.types.Operator):
+# noinspection PyMethodMayBeStatic,PyUnusedLocal
+class A1_FS_OT_COPY_POSE_TRANSFORMS(bpy.types.Operator):
     bl_idname = "a1_fs.copy_pose_transforms"
     bl_label = "copy_pose_transforms"
     bl_description = ""
@@ -138,7 +104,8 @@ class A1_FS_OT_Copy_Pose_Transforms(bpy.types.Operator):
         return self.execute(context)
 
 
-class A1_FS_OT_Clear_Pose_Transforms(bpy.types.Operator):
+# noinspection PyMethodMayBeStatic,PyUnusedLocal
+class A1_FS_OT_CLEAR_POSE_TRANSFORMS(bpy.types.Operator):
     bl_idname = "a1_fs.clear_pose_transforms"
     bl_label = "clear_pose_transforms"
     bl_description = ""
@@ -170,6 +137,7 @@ class A1_FS_OT_Clear_Pose_Transforms(bpy.types.Operator):
         return self.execute(context)
 
 
+# noinspection PyMethodMayBeStatic,PyUnusedLocal
 class A1_FS_OT_ARMATURE_SAVE_AS_SHAPEKEY(bpy.types.Operator):
     bl_idname = "a1_fs.armature_save_as_shapekey"
     bl_label = "armature_save_as_shapekey"
@@ -187,21 +155,19 @@ class A1_FS_OT_ARMATURE_SAVE_AS_SHAPEKEY(bpy.types.Operator):
         return True
 
     def _check_for_existing_shapekeys(self, context, shapekey_name):
-        return any(
-            obj.type == "MESH"
-            and obj.data.shape_keys
-            and shapekey_name in obj.data.shape_keys.key_blocks
-            for obj in context.selected_objects
-        )
+        def __get_meshes():
+            for obj in context.selected_objects:
+                if obj.type == "MESH":
+                    yield obj
+                elif obj.type == "ARMATURE":
+                    for child in obj.children:
+                        if child.type == "MESH":
+                            yield child
 
-    def _remove_duplicate_shapekey(self, obj, shapekey_name):
-        if obj.data.shape_keys is not None:
-            key_blocks = obj.data.shape_keys.key_blocks
-            if shapekey_name in key_blocks:
-                idx = key_blocks.find(shapekey_name)
-                bpy.context.view_layer.objects.active = obj
-                obj.active_shape_key_index = idx
-                bpy.ops.object.shape_key_remove(all=False)
+        return any(
+            obj.data.shape_keys and shapekey_name in obj.data.shape_keys.key_blocks
+            for obj in __get_meshes()
+        )
 
     def _process_object(self, obj, shapekey_name):
         armature_modifier = next(
@@ -211,7 +177,7 @@ class A1_FS_OT_ARMATURE_SAVE_AS_SHAPEKEY(bpy.types.Operator):
         if not armature_modifier:
             return False
 
-        self._remove_duplicate_shapekey(obj, shapekey_name)
+        remove_duplicate_shapekey(obj, shapekey_name)
         bpy.context.view_layer.objects.active = obj
         bpy.ops.object.modifier_apply_as_shapekey(
             keep_modifier=True, modifier=armature_modifier.name
@@ -267,9 +233,9 @@ class A1_FS_OT_ARMATURE_SAVE_AS_SHAPEKEY(bpy.types.Operator):
 
 
 classes = (
-    A1_FS_OT_Copy_Pose_Relations,
-    A1_FS_OT_Copy_Pose_Transforms,
-    A1_FS_OT_Clear_Pose_Transforms,
+    A1_FS_OT_COPY_POSE_RELATIONS,
+    A1_FS_OT_COPY_POSE_TRANSFORMS,
+    A1_FS_OT_CLEAR_POSE_TRANSFORMS,
     A1_FS_OT_ARMATURE_SAVE_AS_SHAPEKEY,
 )
 

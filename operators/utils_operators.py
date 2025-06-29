@@ -3,6 +3,7 @@ import numpy as np
 from ..common.functions import show_message_box
 
 
+# noinspection PyMethodMayBeStatic,PyUnusedLocal
 class A1_FS_OT_UTILS_REMOVE_ZERO_SHAPEKEYS(bpy.types.Operator):
     bl_idname = "a1_fs.utils_remove_zero_shapekeys"
     bl_label = "utils_remove_zero_shapekeys"
@@ -94,8 +95,10 @@ class A1_FS_OT_UTILS_REMOVE_ZERO_SHAPEKEYS(bpy.types.Operator):
                 {"INFO"},
                 f"Deleted {total_deleted} shape keys across {len(target_objects)} objects",
             )
+            return {"FINISHED"}
         else:
             self.report({"INFO"}, "No shape keys were deleted")
+            return {"FINISHED"}
 
     def execute(self, context):
         self._process_all_objects(context)
@@ -106,6 +109,7 @@ class A1_FS_OT_UTILS_REMOVE_ZERO_SHAPEKEYS(bpy.types.Operator):
         return self.execute(context)
 
 
+# noinspection PyMethodMayBeStatic,PyUnusedLocal
 class A1_FS_OT_UTILS_SET_SHAPEKEY_0(bpy.types.Operator):
     bl_idname = "a1_fs.utils_set_shapekey_0"
     bl_label = "utils_set_shapekey_0"

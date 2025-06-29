@@ -38,6 +38,7 @@ def register():
 
     bpy.types.Scene.a1_fs_utils_show_panel = bpy.props.BoolProperty(default=False)
 
+    # noinspection PyUnusedLocal
     def update_skip_prefixes(self, context):
         skip_prefixes = [
             prefix.strip()

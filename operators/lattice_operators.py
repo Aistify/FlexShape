@@ -1,45 +1,10 @@
 ﻿import bpy
 from ..common.functions import show_message_box
+from ..common.functions import remove_duplicate_shapekey
+from ..common.functions import OverwriteWarnOperator
 
 
-class OverwriteWarnOperator(bpy.types.Operator):
-    bl_idname = "a1_fs.overwrite_dialogue"
-    bl_label = "Overwrite Confirmation"
-    bl_options = {"INTERNAL"}
-
-    choice: bpy.props.EnumProperty(
-        items=[("YES", "Yes", "Overwrite"), ("NO", "No", "Skip")], default="NO"
-    )
-
-    callback_fn = None
-
-    @classmethod
-    def register_with_callback(cls, callback):
-        cls.callback_fn = staticmethod(callback)
-        bpy.utils.register_class(cls)
-
-    def execute(self, context):
-        if self.choice == "YES" and self.callback_fn:
-            self.callback_fn(context)
-        else:
-            print("User clicked 'No'")
-
-        bpy.utils.unregister_class(self.__class__)
-        return {"FINISHED"}
-
-    def invoke(self, context, event):
-        return context.window_manager.invoke_props_dialog(self)
-
-    def draw(self, context):
-        layout = self.layout
-        layout.label(text="Shapekeys will be overwritten. Continue?")
-        layout.prop(self, "choice", expand=True)
-
-    def cancel(self, context):
-        print("Dialog cancelled")
-        bpy.utils.unregister_class(self.__class__)
-
-
+# noinspection PyMethodMayBeStatic,PyUnusedLocal
 class A1_FS_OT_ADD_LATTICE(bpy.types.Operator):
     bl_idname = "a1_fs.add_lattice"
     bl_label = "add_lattice"
@@ -103,6 +68,7 @@ class A1_FS_OT_ADD_LATTICE(bpy.types.Operator):
         return self.execute(context)
 
 
+# noinspection PyMethodMayBeStatic,PyUnusedLocal
 class A1_FS_OT_REMOVE_LATTICE(bpy.types.Operator):
     bl_idname = "a1_fs.remove_lattice"
     bl_label = "remove_lattice"
@@ -139,6 +105,7 @@ class A1_FS_OT_REMOVE_LATTICE(bpy.types.Operator):
         return self.execute(context)
 
 
+# noinspection PyMethodMayBeStatic,PyUnusedLocal
 class A1_FS_OT_LATTICE_SAVE_AS_SHAPEKEY(bpy.types.Operator):
     bl_idname = "a1_fs.lattice_save_as_shapekey"
     bl_label = "lattice_save_as_shapekey"
@@ -159,20 +126,11 @@ class A1_FS_OT_LATTICE_SAVE_AS_SHAPEKEY(bpy.types.Operator):
             for obj in context.selected_objects
         )
 
-    def _remove_duplicate_shapekey(self, obj, shapekey_name):
-        if obj.data.shape_keys is not None:
-            key_blocks = obj.data.shape_keys.key_blocks
-            if shapekey_name in key_blocks:
-                idx = key_blocks.find(shapekey_name)
-                bpy.context.view_layer.objects.active = obj
-                obj.active_shape_key_index = idx
-                bpy.ops.object.shape_key_remove(all=False)
-
     def _process_object(self, obj, shapekey_name, remove_lattice):
         if obj.modifiers is not None:
             for modifier in obj.modifiers:
                 if modifier.type == "LATTICE" and modifier.name == "A1ST_LATTICE":
-                    self._remove_duplicate_shapekey(obj, shapekey_name)
+                    remove_duplicate_shapekey(obj, shapekey_name)
                     modifier.name = shapekey_name
                     bpy.context.view_layer.objects.active = obj
                     bpy.ops.object.modifier_apply_as_shapekey(
