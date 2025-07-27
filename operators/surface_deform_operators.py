@@ -132,6 +132,8 @@ class A1_FS_OT_SURFACE_DEFORM_SAVE_AS_SHAPEKEY(bpy.types.Operator):
                         modifier=shapekey_name,
                         keep_modifier=not remove_surface_deform,
                     )
+                    if not remove_surface_deform:
+                        modifier.name = "A1ST_SURFACE_DEFORM"
 
         return True
 
