@@ -1,16 +1,14 @@
 ﻿import bpy
 
 
-class A1_FS_PT_SURFACE_DEFORM_PANEL(bpy.types.Panel):
-    bl_label = "FlexShape Surface Deform Panel"
-    bl_idname = "A1_FS_PT_SURFACE_DEFORM_PANEL"
+# noinspection PyPep8Naming
+class FLEXSHAPE_PT_surface_deform(bpy.types.Panel):
+    bl_idname = "FLEXSHAPE_PT_surface_deform"
+    bl_label = "Surface Deform"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
-
-    # noinspection PyUnusedLocal
-    @classmethod
-    def poll(cls, context):
-        return False
+    bl_category = "FlexShape"
+    bl_options = {'DEFAULT_CLOSED'}
 
     def draw(self, context):
         layout = self.layout
@@ -23,13 +21,13 @@ class A1_FS_PT_SURFACE_DEFORM_PANEL(bpy.types.Panel):
         )
         surface_deform_box.prop(
             context.scene,
-            "a1_fs_surface_deform_source",
+            "flexshape_surface_deform_source",
             text="Source",
             icon="MESH_DATA",
             emboss=True,
         )
         surface_deform_box.operator(
-            "a1_fs.utils_set_shapekey_0",
+            "flexshape.utils_set_shapekey_0",
             text="Set Source Shapekeys to 0",
             icon="SHAPEKEY_DATA",
             emboss=True,
@@ -40,13 +38,13 @@ class A1_FS_PT_SURFACE_DEFORM_PANEL(bpy.types.Panel):
             icon="MOD_SUBSURF",
         )
         surface_deform_box.operator(
-            "a1_fs.add_surface_deform",
+            "flexshape.add_surface_deform",
             text="Add Surface Deform To Selection",
             icon="ADD",
             emboss=True,
         )
         surface_deform_box.operator(
-            "a1_fs.remove_surface_deform",
+            "flexshape.remove_surface_deform",
             text="Remove From Selection",
             icon="REMOVE",
             emboss=True,
@@ -57,20 +55,20 @@ class A1_FS_PT_SURFACE_DEFORM_PANEL(bpy.types.Panel):
         )
         surface_deform_box.prop(
             context.scene,
-            "a1_fs_surface_deform_shapekey_name",
+            "flexshape_surface_deform_shapekey_name",
             text="Name",
             icon="SHAPEKEY_DATA",
             emboss=True,
         )
         surface_deform_box.prop(
             context.scene,
-            "a1_fs_surface_deform_auto_remove",
+            "flexshape_surface_deform_auto_remove",
             text="Auto Remove After Save?",
             icon_value=0,
             emboss=True,
         )
         surface_deform_box.operator(
-            "a1_fs.surface_deform_save_as_shapekey",
+            "flexshape.surface_deform_save_as_shapekey",
             text="Save As Shape Key",
             icon="SHAPEKEY_DATA",
             emboss=True,

@@ -4,19 +4,14 @@ from ..common.functions import remove_duplicate_shapekey
 from ..common.functions import OverwriteWarnOperator
 
 
-# noinspection PyMethodMayBeStatic,PyUnusedLocal
-class A1_FS_OT_ADD_LATTICE(bpy.types.Operator):
-    bl_idname = "a1_fs.add_lattice"
+# noinspection PyPep8Naming
+class FLEXSHAPE_OT_AddLattice(bpy.types.Operator):
+    bl_idname = "flexshape.add_lattice"
     bl_label = "add_lattice"
     bl_description = ""
     bl_options = {"REGISTER", "UNDO"}
 
-    @classmethod
-    def poll(cls, context):
-        if bpy.app.version >= (3, 0, 0) and True:
-            cls.poll_message_set("")
-        return not False
-
+    # noinspection PyMethodMayBeStatic
     def _check_for_duplicates(self, context):
         return any(
             obj.type == "MESH"
@@ -27,6 +22,7 @@ class A1_FS_OT_ADD_LATTICE(bpy.types.Operator):
             for obj in context.selected_objects
         )
 
+    # noinspection PyMethodMayBeStatic
     def _remove_duplicate_lattice(self, obj):
         if obj.modifiers is not None:
             for modifier in obj.modifiers:
@@ -34,6 +30,7 @@ class A1_FS_OT_ADD_LATTICE(bpy.types.Operator):
                     bpy.context.view_layer.objects.active = obj
                     bpy.ops.object.modifier_remove(modifier=modifier.name)
 
+    # noinspection PyMethodMayBeStatic
     def _process_object(self, obj, source_lattice):
         lattice = obj.modifiers.new("A1ST_LATTICE", "LATTICE")
         lattice.object = source_lattice
@@ -48,7 +45,7 @@ class A1_FS_OT_ADD_LATTICE(bpy.types.Operator):
             self._process_object(obj, source_lattice)
 
     def execute(self, context):
-        source_lattice = context.scene.a1_fs_lattice_source
+        source_lattice = context.scene.flexshape_lattice_source
 
         if source_lattice is None:
             show_message_box("Source Lattice was not found.")
@@ -58,29 +55,25 @@ class A1_FS_OT_ADD_LATTICE(bpy.types.Operator):
             OverwriteWarnOperator.register_with_callback(
                 lambda ctx: self._process_all_objects(ctx, source_lattice)
             )
-            bpy.ops.a1_fs.overwrite_dialogue("INVOKE_DEFAULT")
+            # noinspection PyUnresolvedReferences
+            bpy.ops.flexshape.overwrite_dialogue("INVOKE_DEFAULT")
         else:
             self._process_all_objects(context, source_lattice)
 
         return {"FINISHED"}
 
-    def invoke(self, context, event):
+    def invoke(self, context, _):
         return self.execute(context)
 
 
-# noinspection PyMethodMayBeStatic,PyUnusedLocal
-class A1_FS_OT_REMOVE_LATTICE(bpy.types.Operator):
-    bl_idname = "a1_fs.remove_lattice"
+# noinspection PyPep8Naming
+class FLEXSHAPE_OT_RemoveLattice(bpy.types.Operator):
+    bl_idname = "flexshape.remove_lattice"
     bl_label = "remove_lattice"
     bl_description = ""
     bl_options = {"REGISTER", "UNDO"}
 
-    @classmethod
-    def poll(cls, context):
-        if bpy.app.version >= (3, 0, 0) and True:
-            cls.poll_message_set("")
-        return not False
-
+    # noinspection PyMethodMayBeStatic
     def _process_object(self, obj):
         if obj.modifiers is not None:
             for modifier in obj.modifiers:
@@ -101,23 +94,18 @@ class A1_FS_OT_REMOVE_LATTICE(bpy.types.Operator):
 
         return {"FINISHED"}
 
-    def invoke(self, context, event):
+    def invoke(self, context, _):
         return self.execute(context)
 
 
-# noinspection PyMethodMayBeStatic,PyUnusedLocal
-class A1_FS_OT_LATTICE_SAVE_AS_SHAPEKEY(bpy.types.Operator):
-    bl_idname = "a1_fs.lattice_save_as_shapekey"
+# noinspection PyPep8Naming
+class FLEXSHAPE_OT_LatticeSaveAsShapekey(bpy.types.Operator):
+    bl_idname = "flexshape.lattice_save_as_shapekey"
     bl_label = "lattice_save_as_shapekey"
     bl_description = ""
     bl_options = {"REGISTER", "UNDO"}
 
-    @classmethod
-    def poll(cls, context):
-        if bpy.app.version >= (3, 0, 0) and True:
-            cls.poll_message_set("")
-        return not False
-
+    # noinspection PyMethodMayBeStatic
     def _check_for_existing_shapekeys(self, context, shapekey_name):
         return any(
             obj.type == "MESH"
@@ -126,6 +114,7 @@ class A1_FS_OT_LATTICE_SAVE_AS_SHAPEKEY(bpy.types.Operator):
             for obj in context.selected_objects
         )
 
+    # noinspection PyMethodMayBeStatic
     def _process_object(self, obj, shapekey_name, remove_lattice):
         if obj.modifiers is not None:
             for modifier in obj.modifiers:
@@ -149,11 +138,11 @@ class A1_FS_OT_LATTICE_SAVE_AS_SHAPEKEY(bpy.types.Operator):
             self._process_object(obj, shapekey_name, remove_lattice)
 
     def execute(self, context):
-        shapekey_name = context.scene.a1_fs_lattice_shapekey_name
-        remove_lattice = context.scene.a1_fs_lattice_auto_remove
+        shapekey_name = context.scene.flexshape_lattice_shapekey_name
+        remove_lattice = context.scene.flexshape_lattice_auto_remove
 
         if shapekey_name == "":
-            shapekey_name = context.scene.a1_fs_lattice_source.name
+            shapekey_name = context.scene.flexshape_lattice_source.name
 
         if self._check_for_existing_shapekeys(context, shapekey_name):
             OverwriteWarnOperator.register_with_callback(
@@ -161,20 +150,21 @@ class A1_FS_OT_LATTICE_SAVE_AS_SHAPEKEY(bpy.types.Operator):
                     ctx, shapekey_name, remove_lattice
                 )
             )
-            bpy.ops.a1_fs.overwrite_dialogue("INVOKE_DEFAULT")
+            # noinspection PyUnresolvedReferences
+            bpy.ops.flexshape.overwrite_dialogue("INVOKE_DEFAULT")
         else:
             self._process_all_objects(context, shapekey_name, remove_lattice)
 
         return {"FINISHED"}
 
-    def invoke(self, context, event):
+    def invoke(self, context, _):
         return self.execute(context)
 
 
 classes = (
-    A1_FS_OT_ADD_LATTICE,
-    A1_FS_OT_REMOVE_LATTICE,
-    A1_FS_OT_LATTICE_SAVE_AS_SHAPEKEY,
+    FLEXSHAPE_OT_AddLattice,
+    FLEXSHAPE_OT_RemoveLattice,
+    FLEXSHAPE_OT_LatticeSaveAsShapekey,
 )
 
 

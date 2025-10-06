@@ -1,26 +1,31 @@
-﻿import bpy
-import json
+﻿import json
+from dataclasses import dataclass
 from typing import List, Dict
+
+import bpy
 
 
 def show_message_box(message="", title="Message Box", icon="INFO"):
-    # noinspection PyUnusedLocal
-    def draw(self, context):
+    def draw(self, _):
         self.layout.label(text=message)
 
     bpy.context.window_manager.popup_menu(draw, title=title, icon=icon)
 
 
+@dataclass
 class BlendShape:
-    def __init__(self, blendName: str, blendIndex: int, blendValue: float):
-        self.blendName = blendName
-        self.blendIndex = blendIndex
-        self.blendValue = blendValue
+    blend_name: str
+    blend_index: int
+    blend_value: float
 
 
+@dataclass
 class BlendCategory:
-    def __init__(self, blendshapes: List[BlendShape] = None):
-        self.blendshapes = blendshapes or []
+    blendshapes: List[BlendShape] = None
+
+    def __post_init__(self):
+        if self.blendshapes is None:
+            self.blendshapes = []
 
 
 def read_blendshape_data_json(json_file) -> Dict[str, BlendCategory]:
@@ -31,12 +36,12 @@ def read_blendshape_data_json(json_file) -> Dict[str, BlendCategory]:
 
     for blend_shape in blendshape_data["blendShapeDataList"]:
         blend_shape_data = BlendShape(
-            blendName=blend_shape["blendName"],
-            blendIndex=blend_shape["blendIndex"],
-            blendValue=blend_shape["blendValue"],
+            blend_name=blend_shape["blendName"],
+            blend_index=blend_shape["blendIndex"],
+            blend_value=blend_shape["blendValue"],
         )
 
-        identifier = blend_shape_data.blendName.split("_")[0]
+        identifier = blend_shape_data.blend_name.split("_")[0]
 
         if identifier not in categories:
             categories[identifier] = BlendCategory()
@@ -62,12 +67,12 @@ def remove_duplicate_shapekey(obj, shapekey_name):
             bpy.ops.object.shape_key_remove(all=False)
 
 
-# noinspection PyUnusedLocal
 class OverwriteWarnOperator(bpy.types.Operator):
-    bl_idname = "a1_fs.overwrite_dialogue"
+    bl_idname = "flexshape.overwrite_dialogue"
     bl_label = "Overwrite Confirmation"
     bl_options = {"INTERNAL"}
 
+    # noinspection PyTypeHints
     choice: bpy.props.EnumProperty(
         items=[("YES", "Yes", "Overwrite"), ("NO", "No", "Skip")], default="NO"
     )
@@ -89,13 +94,13 @@ class OverwriteWarnOperator(bpy.types.Operator):
         bpy.utils.unregister_class(self.__class__)
         return {"FINISHED"}
 
-    def invoke(self, context, event):
+    def invoke(self, context, _):
         return context.window_manager.invoke_props_dialog(self)
 
-    def draw(self, context):
+    def draw(self, _):
         layout = self.layout
         layout.label(text="Shapekeys will be overwritten. Continue?")
         layout.prop(self, "choice", expand=True)
 
-    def cancel(self, context):
+    def cancel(self, _):
         bpy.utils.unregister_class(self.__class__)

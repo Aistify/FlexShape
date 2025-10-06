@@ -1,16 +1,14 @@
 ﻿import bpy
 
 
-class A1_FS_PT_UTILS_PANEL(bpy.types.Panel):
-    bl_label = "FlexShape Utils Panel"
-    bl_idname = "A1_FS_PT_UTILS_PANEL"
+# noinspection PyPep8Naming
+class FLEXSHAPE_PT_utils(bpy.types.Panel):
+    bl_idname = "FLEXSHAPE_PT_utils"
+    bl_label = "Utils"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
-
-    # noinspection PyUnusedLocal
-    @classmethod
-    def poll(cls, context):
-        return False
+    bl_category = "FlexShape"
+    bl_options = {'DEFAULT_CLOSED'}
 
     def draw(self, context):
         layout = self.layout
@@ -21,27 +19,27 @@ class A1_FS_PT_UTILS_PANEL(bpy.types.Panel):
         )
         remove_zero_impact_shapekey_box.prop(
             context.scene,
-            "a1_fs_utils_skip_prefix",
+            "flexshape_utils_skip_prefix",
             text="Prefixes to Skip",
             icon_value=0,
             emboss=True,
         )
         remove_zero_impact_shapekey_box.prop(
             context.scene,
-            "a1_fs_util_shapekey_threshold",
+            "flexshape_util_shapekey_threshold",
             text="Vertex Diff Threshold",
             icon_value=0,
             emboss=True,
         )
         remove_zero_impact_shapekey_box.operator(
-            "a1_fs.utils_remove_zero_shapekeys",
+            "flexshape.utils_remove_zero_shapekeys",
             text="Remove from Selection",
             icon="SHAPEKEY_DATA",
             emboss=True,
         ).use_selection = True
         remove_zero_impact_shapekey_box.operator(
-            "a1_fs.utils_remove_zero_shapekeys",
-            text="Remove from Armature's Children",
+            "flexshape.utils_remove_zero_shapekeys",
+            text="Remove from Armature Children",
             icon="SHAPEKEY_DATA",
             emboss=True,
         ).use_selection = False
@@ -49,7 +47,7 @@ class A1_FS_PT_UTILS_PANEL(bpy.types.Panel):
         set_shapekey_to_zero_box = layout.box()
         set_shapekey_to_zero_box.label(text="Reset Shapekeys", icon="SHAPEKEY_DATA")
         set_shapekey_to_zero_box.operator(
-            "a1_fs.utils_set_shapekey_0",
+            "flexshape.utils_set_shapekey_0",
             text="Reset from Selection",
             icon="SHAPEKEY_DATA",
             emboss=True,

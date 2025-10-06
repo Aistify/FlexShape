@@ -13,6 +13,20 @@ bl_info = {
     "category": "3D View",
 }
 
+if "bpy" in locals():
+    import sys
+    import importlib
+
+    package_name = __package__
+
+    module_names = ["panels", "properties", "operators", "common"]
+
+    for module_name in module_names:
+        full_module_name = f"{package_name}.{module_name}"
+        if full_module_name in sys.modules:
+            importlib.reload(sys.modules[full_module_name])
+            print(f"Reloaded: FlexShape {module_name}")
+
 import bpy
 import bpy.utils.previews
 from . import (

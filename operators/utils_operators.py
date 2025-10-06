@@ -3,23 +3,19 @@ import numpy as np
 from ..common.functions import show_message_box
 
 
-# noinspection PyMethodMayBeStatic,PyUnusedLocal
-class A1_FS_OT_UTILS_REMOVE_ZERO_SHAPEKEYS(bpy.types.Operator):
-    bl_idname = "a1_fs.utils_remove_zero_shapekeys"
+# noinspection PyPep8Naming
+class FLEXSHAPE_OT_UtilsRemoveZeroShapekeys(bpy.types.Operator):
+    bl_idname = "flexshape.utils_remove_zero_shapekeys"
     bl_label = "utils_remove_zero_shapekeys"
     bl_description = ""
     bl_options = {"REGISTER", "UNDO"}
 
+    # noinspection PyTypeHints
     use_selection: bpy.props.BoolProperty(
         default=True,
     )
 
-    @classmethod
-    def poll(cls, context):
-        if bpy.app.version >= (3, 0, 0):
-            cls.poll_message_set("")
-        return True
-
+    # noinspection PyMethodMayBeStatic
     def _process_object(self, obj, threshold, prefixes_to_skip=None):
         if prefixes_to_skip is None:
             prefixes_to_skip = []
@@ -80,10 +76,10 @@ class A1_FS_OT_UTILS_REMOVE_ZERO_SHAPEKEYS(bpy.types.Operator):
             if obj.data.shape_keys is None:
                 continue
 
-            threshold = context.scene.a1_fs_util_shapekey_threshold
+            threshold = context.scene.flexshape_utils_shapekey_threshold
             prefixes_to_skip = [
                 prefix.strip()
-                for prefix in context.scene.a1_fs_utils_skip_prefix.split(",")
+                for prefix in context.scene.flexshape_utils_skip_prefix.split(",")
                 if prefix.strip()
             ]
 
@@ -105,27 +101,23 @@ class A1_FS_OT_UTILS_REMOVE_ZERO_SHAPEKEYS(bpy.types.Operator):
 
         return {"FINISHED"}
 
-    def invoke(self, context, event):
+    def invoke(self, context, _):
         return self.execute(context)
 
 
-# noinspection PyMethodMayBeStatic,PyUnusedLocal
-class A1_FS_OT_UTILS_SET_SHAPEKEY_0(bpy.types.Operator):
-    bl_idname = "a1_fs.utils_set_shapekey_0"
+# noinspection PyPep8Naming
+class FLEXSHAPE_OT_UtilsSetShapekey0(bpy.types.Operator):
+    bl_idname = "flexshape.utils_set_shapekey_0"
     bl_label = "utils_set_shapekey_0"
     bl_description = ""
     bl_options = {"REGISTER", "UNDO"}
 
+    # noinspection PyTypeHints
     use_selection: bpy.props.BoolProperty(
         default=True,
     )
 
-    @classmethod
-    def poll(cls, context):
-        if bpy.app.version >= (3, 0, 0) and True:
-            cls.poll_message_set("")
-        return not False
-
+    # noinspection PyMethodMayBeStatic
     def _process_object(self, obj):
         for shapekey in obj.data.shape_keys.key_blocks[1:]:
             shapekey.value = 0.0
@@ -136,7 +128,7 @@ class A1_FS_OT_UTILS_SET_SHAPEKEY_0(bpy.types.Operator):
         if self.use_selection:
             target_objects = context.selected_objects
         else:
-            target_objects = [context.scene.a1_fs_surface_deform_source]
+            target_objects = [context.scene.flexshape_surface_deform_source]
 
         for obj in target_objects:
             if obj.type != "MESH":
@@ -152,11 +144,11 @@ class A1_FS_OT_UTILS_SET_SHAPEKEY_0(bpy.types.Operator):
 
         return {"FINISHED"}
 
-    def invoke(self, context, event):
+    def invoke(self, context, _):
         return self.execute(context)
 
 
-classes = (A1_FS_OT_UTILS_REMOVE_ZERO_SHAPEKEYS, A1_FS_OT_UTILS_SET_SHAPEKEY_0)
+classes = (FLEXSHAPE_OT_UtilsRemoveZeroShapekeys, FLEXSHAPE_OT_UtilsSetShapekey0)
 
 
 def register():
