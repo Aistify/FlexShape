@@ -13,23 +13,30 @@ jobs:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
-        
+
     - name: Get version
       id: version
       run: |
         latest=$(git tag -l "v1.*" | sort -V | tail -n1)
         if [ -z "$latest" ]; then
-          echo "tag=v1.1" >> $GITHUB_OUTPUT
+          tag="v1.0"
+          minor=0
         else
-          minor=$(echo $latest | sed 's/v1\.//')
-          echo "tag=v1.$((minor + 1))" >> $GITHUB_OUTPUT
+          minor=$(echo $latest | sed 's/v1\.//' | sed 's/^0*//')
+          [ -z "$minor" ] && minor=0
+          minor=$((minor + 1))
+          [ $minor -lt 10 ] && tag="v1.0$minor" || tag="v1.$minor"
         fi
+        echo "tag=$tag" >> $GITHUB_OUTPUT
+        echo "minor=$minor" >> $GITHUB_OUTPUT
         
+        sed -i "s/\"version\": ([^)]*)/\"version\": (1, $minor, 0)/" __init__.py
+
     - uses: thedoctor0/zip-release@0.7.5
       with:
         filename: FlexShape-${{ steps.version.outputs.tag }}.zip
         exclusions: '*.git* node_modules/* .github/*'
-        
+
     - uses: ncipollo/release-action@v1.12.0
       with:
         tag: ${{ steps.version.outputs.tag }}
