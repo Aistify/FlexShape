@@ -1,6 +1,25 @@
 ﻿import bpy
 
 
+# class FlexShapeLatticeListItem(bpy.types.PropertyGroup):
+#     lattice: bpy.props.PointerProperty(
+#         name="Lattice",
+#         type=bpy.types.Object,
+#         poll=lambda self, obj: obj.type == "LATTICE",
+#     )
+#
+#
+
+
+# noinspection PyPep8Naming, PyTypeHints
+class FLEXSHAPE_ArmatureListItem(bpy.types.PropertyGroup):
+    armature: bpy.props.PointerProperty(
+        name="Armature",
+        type=bpy.types.Object,
+        poll=lambda self, obj: obj.type == "ARMATURE",
+    )
+
+
 # noinspection PyNoneFunctionAssignment
 def register():
     bpy.types.Scene.flexshape_armature_source = bpy.props.PointerProperty(
@@ -8,6 +27,11 @@ def register():
         poll=lambda self, obj: obj.type == "ARMATURE",
     )
     bpy.types.Scene.flexshape_armature_shapekey_name = bpy.props.StringProperty()
+    bpy.utils.register_class(FLEXSHAPE_ArmatureListItem)
+    bpy.types.Scene.flexshape_armature_list = bpy.props.CollectionProperty(
+        type=FLEXSHAPE_ArmatureListItem
+    )
+    bpy.types.Scene.flexshape_armature_list_index = bpy.props.IntProperty(default=0)
 
     bpy.types.Scene.flexshape_lattice_source = bpy.props.PointerProperty(
         type=bpy.types.Object,
@@ -55,6 +79,9 @@ def register():
 def unregister():
     del bpy.types.Scene.flexshape_armature_source
     del bpy.types.Scene.flexshape_armature_shapekey_name
+    bpy.utils.unregister_class(FLEXSHAPE_ArmatureListItem)
+    del bpy.types.Scene.flexshape_armature_list
+    del bpy.types.Scene.flexshape_armature_list_index
 
     del bpy.types.Scene.flexshape_lattice_source
     del bpy.types.Scene.flexshape_lattice_shapekey_name

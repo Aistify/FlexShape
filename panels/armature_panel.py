@@ -70,3 +70,31 @@ class FLEXSHAPE_PT_armature(bpy.types.Panel):
             icon="PLAY",
             emboss=True,
         )
+
+        armature_box.label(text="Mass Armature To Shape Keys", icon="DOCUMENTS")
+        row = armature_box.row()
+        row.template_list(
+            "FLEXSHAPE_UL_ArmatureList",
+            "",
+            context.scene,
+            "flexshape_armature_list",
+            context.scene,
+            "flexshape_armature_list_index",
+            rows=5,
+        )
+
+        col = row.column(align=True)
+        col.operator("flexshape.add_armature_to_list", icon="ADD", text="")
+        col.operator("flexshape.remove_armature_from_list", icon="REMOVE", text="")
+        col.separator()
+        col.operator("flexshape.move_armature_up", icon="TRIA_UP", text="")
+        col.operator("flexshape.move_armature_down", icon="TRIA_DOWN", text="")
+        col.separator()
+        col.operator("flexshape.clear_armature_list", icon="X", text="")
+
+        armature_box.operator(
+            "flexshape.armature_quick_save",
+            text="Quick Save List (Full Process)",
+            icon="PLAY",
+            emboss=True,
+        )

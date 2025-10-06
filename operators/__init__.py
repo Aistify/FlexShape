@@ -6,6 +6,7 @@ if "armature_operators" in locals():
 
     submodules = [
         "armature_operators",
+        "armature_list_operators",
         "lattice_operators",
         "surface_deform_operators",
         "utils_operators",
@@ -19,6 +20,7 @@ if "armature_operators" in locals():
 
 from . import (
     armature_operators,
+    armature_list_operators,
     lattice_operators,
     surface_deform_operators,
     utils_operators,
@@ -27,6 +29,7 @@ from . import (
 
 def register():
     armature_operators.register()
+    armature_list_operators.register()
     lattice_operators.register()
     surface_deform_operators.register()
     utils_operators.register()
@@ -34,6 +37,7 @@ def register():
 
 def unregister():
     armature_operators.unregister()
+    armature_list_operators.unregister()
     lattice_operators.unregister()
     surface_deform_operators.unregister()
     utils_operators.unregister()
