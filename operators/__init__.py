@@ -10,6 +10,7 @@ if "armature_operators" in locals():
         "lattice_operators",
         "lattice_list_operators",
         "surface_deform_operators",
+        "surface_deform_list_operators",
         "utils_operators",
     ]
 
@@ -25,6 +26,7 @@ from . import (
     lattice_operators,
     lattice_list_operators,
     surface_deform_operators,
+    surface_deform_list_operators,
     utils_operators,
 )
 
@@ -35,6 +37,7 @@ def register():
     lattice_operators.register()
     lattice_list_operators.register()
     surface_deform_operators.register()
+    surface_deform_list_operators.register()
     utils_operators.register()
 
 
@@ -44,4 +47,5 @@ def unregister():
     lattice_operators.unregister()
     lattice_list_operators.unregister()
     surface_deform_operators.unregister()
+    surface_deform_list_operators.unregister()
     utils_operators.unregister()

@@ -73,3 +73,34 @@ class FLEXSHAPE_PT_surface_deform(bpy.types.Panel):
             icon="SHAPEKEY_DATA",
             emboss=True,
         )
+
+        surface_deform_box.operator(
+            "flexshape.load_source_shapekeys",
+            text="Load Shapekeys from Source",
+            icon="FILE_REFRESH",
+            emboss=True,
+        )
+
+        surface_deform_box.label(text="Shapekeys to Copy", icon="SHAPEKEY_DATA")
+
+        row = surface_deform_box.row()
+        row.template_list(
+            "FLEXSHAPE_UL_SurfaceDeformShapekeyList",
+            "",
+            context.scene,
+            "flexshape_surface_deform_shapekey_list",
+            context.scene,
+            "flexshape_surface_deform_shapekey_list_index",
+            rows=5,
+        )
+
+        col = row.column(align=True)
+        col.operator("flexshape.select_all_shapekeys", icon="CHECKBOX_HLT", text="")
+        col.operator("flexshape.deselect_all_shapekeys", icon="CHECKBOX_DEHLT", text="")
+
+        surface_deform_box.operator(
+            "flexshape.surface_deform_mass_save",
+            text="Save Selected Shapekeys To Selection",
+            icon="PLAY",
+            emboss=True,
+        )

@@ -2,6 +2,15 @@
 
 
 # noinspection PyPep8Naming, PyTypeHints
+class FLEXSHAPE_ArmatureListItem(bpy.types.PropertyGroup):
+    armature: bpy.props.PointerProperty(
+        name="Armature",
+        type=bpy.types.Object,
+        poll=lambda self, obj: obj.type == "ARMATURE",
+    )
+
+
+# noinspection PyPep8Naming, PyTypeHints
 class FLEXSHAPE_LatticeListItem(bpy.types.PropertyGroup):
     lattice: bpy.props.PointerProperty(
         name="Lattice",
@@ -11,12 +20,9 @@ class FLEXSHAPE_LatticeListItem(bpy.types.PropertyGroup):
 
 
 # noinspection PyPep8Naming, PyTypeHints
-class FLEXSHAPE_ArmatureListItem(bpy.types.PropertyGroup):
-    armature: bpy.props.PointerProperty(
-        name="Armature",
-        type=bpy.types.Object,
-        poll=lambda self, obj: obj.type == "ARMATURE",
-    )
+class FLEXSHAPE_SurfaceDeformShapekeyItem(bpy.types.PropertyGroup):
+    name: bpy.props.StringProperty(name="Shapekey Name")
+    enabled: bpy.props.BoolProperty(name="Enabled", default=False)
 
 
 # noinspection PyNoneFunctionAssignment
@@ -51,6 +57,13 @@ def register():
     bpy.types.Scene.flexshape_surface_deform_shapekey_name = bpy.props.StringProperty()
     bpy.types.Scene.flexshape_surface_deform_auto_remove = bpy.props.BoolProperty(
         default=True
+    )
+    bpy.utils.register_class(FLEXSHAPE_SurfaceDeformShapekeyItem)
+    bpy.types.Scene.flexshape_surface_deform_shapekey_list = (
+        bpy.props.CollectionProperty(type=FLEXSHAPE_SurfaceDeformShapekeyItem)
+    )
+    bpy.types.Scene.flexshape_surface_deform_shapekey_list_index = (
+        bpy.props.IntProperty(default=0)
     )
 
     # noinspection PyUnusedLocal
@@ -97,6 +110,9 @@ def unregister():
     del bpy.types.Scene.flexshape_surface_deform_source
     del bpy.types.Scene.flexshape_surface_deform_shapekey_name
     del bpy.types.Scene.flexshape_surface_deform_auto_remove
+    bpy.utils.unregister_class(FLEXSHAPE_SurfaceDeformShapekeyItem)
+    del bpy.types.Scene.flexshape_surface_deform_shapekey_list
+    del bpy.types.Scene.flexshape_surface_deform_shapekey_list_index
 
     del bpy.types.Scene.flexshape_utils_skip_prefix
     del bpy.types.Scene.flexshape_utils_shapekey_threshold

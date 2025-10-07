@@ -4,7 +4,7 @@ from ..common.functions import remove_duplicate_shapekey
 from ..common.functions import OverwriteWarnOperator
 
 
-def save_lattice_as_shapekey(obj, shapekey_name, keep_lattice):
+def save_lattice_as_shapekey(obj, shapekey_name, cleanup_modifier):
     if obj.modifiers is not None:
         for modifier in obj.modifiers:
             if modifier.type == "LATTICE" and modifier.name == "A1ST_LATTICE":
@@ -12,9 +12,9 @@ def save_lattice_as_shapekey(obj, shapekey_name, keep_lattice):
                 modifier.name = shapekey_name
                 bpy.context.view_layer.objects.active = obj
                 bpy.ops.object.modifier_apply_as_shapekey(
-                    modifier=modifier.name, keep_modifier=keep_lattice
+                    modifier=modifier.name, keep_modifier=cleanup_modifier
                 )
-                if keep_lattice:
+                if cleanup_modifier:
                     modifier.name = "A1ST_LATTICE"
 
     return True
@@ -123,16 +123,16 @@ class FLEXSHAPE_OT_LatticeSaveAsShapekey(bpy.types.Operator):
         )
 
     # noinspection PyMethodMayBeStatic
-    def _process_all_objects(self, context, shapekey_name, remove_lattice):
+    def _process_all_objects(self, context, shapekey_name, cleanup_modifier):
         for obj in context.selected_objects:
             if obj.type != "MESH":
                 continue
 
-            save_lattice_as_shapekey(obj, shapekey_name, remove_lattice)
+            save_lattice_as_shapekey(obj, shapekey_name, cleanup_modifier)
 
     def execute(self, context):
         shapekey_name = context.scene.flexshape_lattice_shapekey_name
-        remove_lattice = context.scene.flexshape_lattice_auto_remove
+        cleanup_modifier = context.scene.flexshape_lattice_auto_remove
 
         if shapekey_name == "":
             shapekey_name = context.scene.flexshape_lattice_source.name
@@ -140,13 +140,13 @@ class FLEXSHAPE_OT_LatticeSaveAsShapekey(bpy.types.Operator):
         if self._check_for_existing_shapekeys(context, shapekey_name):
             OverwriteWarnOperator.register_with_callback(
                 lambda ctx: self._process_all_objects(
-                    ctx, shapekey_name, remove_lattice
+                    ctx, shapekey_name, cleanup_modifier
                 )
             )
             # noinspection PyUnresolvedReferences
             bpy.ops.flexshape.overwrite_dialogue("INVOKE_DEFAULT")
         else:
-            self._process_all_objects(context, shapekey_name, remove_lattice)
+            self._process_all_objects(context, shapekey_name, cleanup_modifier)
 
         return {"FINISHED"}
 
