@@ -64,6 +64,34 @@ def save_armature_deform_as_shapekey(obj, shapekey_name):
     return True
 
 
+def quick_save_armature_as_shapekey(
+    context, source_armature, target_armatures, shapekey_name=""
+):
+    if source_armature is None:
+        show_message_box("Source Armature was not found.")
+        return {"CANCELLED"}
+
+    if shapekey_name == "":
+        shapekey_name = source_armature.name
+
+    source_pose_bones = source_armature.pose.bones
+
+    for target_armature in target_armatures:
+        if target_armature == source_armature:
+            continue
+
+        copy_pose_relations(target_armature, source_pose_bones)
+        copy_pose_transforms(target_armature, source_pose_bones)
+        target_objects = [
+            child for child in target_armature.children if child.type == "MESH"
+        ]
+        for obj in target_objects:
+            save_armature_deform_as_shapekey(obj, shapekey_name)
+        clear_pose_transforms(context, target_armature)
+
+    return True
+
+
 # noinspection PyPep8Naming
 class FLEXSHAPE_OT_CopyPoseRelations(bpy.types.Operator):
     bl_idname = "flexshape.copy_pose_relations"
@@ -234,34 +262,48 @@ class FLEXSHAPE_OT_ArmatureQuickSave(bpy.types.Operator):
 
     # noinspection PyMethodMayBeStatic
     def execute(self, context):
-        shapekey_name = context.scene.flexshape_armature_shapekey_name
         active_obj = context.active_object
+        selected_objects = [
+            obj for obj in context.selected_objects if obj.type == "ARMATURE"
+        ]
+
+        shapekey_name = context.scene.flexshape_armature_shapekey_name
         source_armature = bpy.context.scene.flexshape_armature_source
-        selected_objects = [obj for obj in context.selected_objects]
 
-        if source_armature is None:
-            show_message_box("Source Armature was not found.")
-            return {"CANCELLED"}
+        quick_save_armature_as_shapekey(
+            context, source_armature, selected_objects, shapekey_name
+        )
 
-        if shapekey_name == "":
-            shapekey_name = context.scene.flexshape_armature_source.name
+        for obj in selected_objects:
+            obj.select_set(True)
+        context.view_layer.objects.active = active_obj
 
-        source_pose_bones = source_armature.pose.bones
+        return {"FINISHED"}
 
-        for target_armature in selected_objects:
-            if target_armature.type != "ARMATURE":
-                continue
-            if target_armature == source_armature:
-                continue
 
-            copy_pose_relations(target_armature, source_pose_bones)
-            copy_pose_transforms(target_armature, source_pose_bones)
-            target_objects = [
-                child for child in target_armature.children if child.type == "MESH"
-            ]
-            for obj in target_objects:
-                save_armature_deform_as_shapekey(obj, shapekey_name)
-            clear_pose_transforms(context, target_armature)
+# noinspection PyPep8Naming
+class FLEXSHAPE_OT_ArmatureMassSave(bpy.types.Operator):
+    bl_idname = "flexshape.armature_mass_save"
+    bl_label = "Mass Save Shape Key"
+    bl_description = "For Each In List: Copy Relations -> Copy Transforms -> Save As Shape Key -> Clear Transforms"
+    bl_options = {"REGISTER", "UNDO"}
+
+    # noinspection PyMethodMayBeStatic
+    def execute(self, context):
+        active_obj = context.active_object
+        selected_objects = [
+            obj for obj in context.selected_objects if obj.type == "ARMATURE"
+        ]
+
+        armature_list = context.scene.flexshape_armature_list
+
+        for armature_list_item in armature_list:
+            quick_save_armature_as_shapekey(
+                context,
+                armature_list_item.armature,
+                selected_objects,
+                armature_list_item.armature.name,
+            )
 
         for obj in selected_objects:
             obj.select_set(True)
@@ -276,6 +318,7 @@ classes = (
     FLEXSHAPE_OT_ClearPoseTransforms,
     FLEXSHAPE_OT_SaveArmatureDeformAsShapekey,
     FLEXSHAPE_OT_ArmatureQuickSave,
+    FLEXSHAPE_OT_ArmatureMassSave,
 )
 
 

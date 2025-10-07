@@ -1,14 +1,13 @@
 ﻿import bpy
 
 
-# class FlexShapeLatticeListItem(bpy.types.PropertyGroup):
-#     lattice: bpy.props.PointerProperty(
-#         name="Lattice",
-#         type=bpy.types.Object,
-#         poll=lambda self, obj: obj.type == "LATTICE",
-#     )
-#
-#
+# noinspection PyPep8Naming, PyTypeHints
+class FLEXSHAPE_LatticeListItem(bpy.types.PropertyGroup):
+    lattice: bpy.props.PointerProperty(
+        name="Lattice",
+        type=bpy.types.Object,
+        poll=lambda self, obj: obj.type == "LATTICE",
+    )
 
 
 # noinspection PyPep8Naming, PyTypeHints
@@ -39,6 +38,11 @@ def register():
     )
     bpy.types.Scene.flexshape_lattice_shapekey_name = bpy.props.StringProperty()
     bpy.types.Scene.flexshape_lattice_auto_remove = bpy.props.BoolProperty(default=True)
+    bpy.utils.register_class(FLEXSHAPE_LatticeListItem)
+    bpy.types.Scene.flexshape_lattice_list = bpy.props.CollectionProperty(
+        type=FLEXSHAPE_LatticeListItem
+    )
+    bpy.types.Scene.flexshape_lattice_list_index = bpy.props.IntProperty(default=0)
 
     bpy.types.Scene.flexshape_surface_deform_source = bpy.props.PointerProperty(
         type=bpy.types.Object,
@@ -86,6 +90,9 @@ def unregister():
     del bpy.types.Scene.flexshape_lattice_source
     del bpy.types.Scene.flexshape_lattice_shapekey_name
     del bpy.types.Scene.flexshape_lattice_auto_remove
+    bpy.utils.unregister_class(FLEXSHAPE_LatticeListItem)
+    del bpy.types.Scene.flexshape_lattice_list
+    del bpy.types.Scene.flexshape_lattice_list_index
 
     del bpy.types.Scene.flexshape_surface_deform_source
     del bpy.types.Scene.flexshape_surface_deform_shapekey_name

@@ -9,7 +9,7 @@ class FLEXSHAPE_PT_blendshape_utils(bpy.types.Panel):
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     bl_category = "FlexShape"
-    bl_options = {'DEFAULT_CLOSED'}
+    bl_options = {"DEFAULT_CLOSED"}
 
     # noinspection PyUnusedLocal
     @classmethod

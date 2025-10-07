@@ -93,7 +93,7 @@ class FLEXSHAPE_PT_armature(bpy.types.Panel):
         col.operator("flexshape.clear_armature_list", icon="X", text="")
 
         armature_box.operator(
-            "flexshape.armature_quick_save",
+            "flexshape.armature_mass_save",
             text="Quick Save List (Full Process)",
             icon="PLAY",
             emboss=True,
