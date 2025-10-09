@@ -1,6 +1,24 @@
 ﻿import bpy
 
 
+def _update_skip_prefixes(_, context):
+    __ = [
+        prefix.strip()
+        for prefix in context.scene.flexshape_utils_skip_prefix.split(",")
+        if prefix.strip()
+    ]
+
+
+def _update_source_shapekeys(_, context):
+    if context.scene.flexshape_surface_deform_source:
+        try:
+            bpy.ops.flexshape.load_source_shapekeys()
+        except Exception as e:
+            print(f"Error loading shapekeys: {e}")
+    else:
+        context.scene.flexshape_surface_deform_shapekey_list.clear()
+
+
 # noinspection PyPep8Naming, PyTypeHints
 class FLEXSHAPE_ArmatureListItem(bpy.types.PropertyGroup):
     armature: bpy.props.PointerProperty(
@@ -25,97 +43,128 @@ class FLEXSHAPE_SurfaceDeformShapekeyItem(bpy.types.PropertyGroup):
     enabled: bpy.props.BoolProperty(name="Enabled", default=False)
 
 
-# noinspection PyNoneFunctionAssignment
-def register():
-    bpy.types.Scene.flexshape_armature_source = bpy.props.PointerProperty(
+# noinspection PyPep8Naming, PyTypeHints
+class FLEXSHAPE_BlendShapeItem(bpy.types.PropertyGroup):
+    blend_name: bpy.props.StringProperty(name="Blend Name")
+    blend_index: bpy.props.IntProperty(name="Blend Index")
+    blend_value: bpy.props.FloatProperty(name="Blend Value")
+
+
+# noinspection PyPep8Naming, PyTypeHints
+class FLEXSHAPE_BlendCategoryItem(bpy.types.PropertyGroup):
+    category_name: bpy.props.StringProperty(name="Category Name")
+    blendshapes: bpy.props.CollectionProperty(type=FLEXSHAPE_BlendShapeItem)
+
+
+property_groups = (
+    FLEXSHAPE_ArmatureListItem,
+    FLEXSHAPE_LatticeListItem,
+    FLEXSHAPE_SurfaceDeformShapekeyItem,
+    FLEXSHAPE_BlendShapeItem,
+    FLEXSHAPE_BlendCategoryItem,
+)
+
+
+ARMATURE_PROPS = {
+    "flexshape_armature_source": bpy.props.PointerProperty(
         type=bpy.types.Object,
         poll=lambda self, obj: obj.type == "ARMATURE",
-    )
-    bpy.types.Scene.flexshape_armature_shapekey_name = bpy.props.StringProperty()
-    bpy.utils.register_class(FLEXSHAPE_ArmatureListItem)
-    bpy.types.Scene.flexshape_armature_list = bpy.props.CollectionProperty(
+    ),
+    "flexshape_armature_shapekey_name": bpy.props.StringProperty(),
+    "flexshape_armature_list": bpy.props.CollectionProperty(
         type=FLEXSHAPE_ArmatureListItem
-    )
-    bpy.types.Scene.flexshape_armature_list_index = bpy.props.IntProperty(default=0)
+    ),
+    "flexshape_armature_list_index": bpy.props.IntProperty(default=0),
+}
 
-    bpy.types.Scene.flexshape_lattice_source = bpy.props.PointerProperty(
+
+LATTICE_PROPS = {
+    "flexshape_lattice_source": bpy.props.PointerProperty(
         type=bpy.types.Object,
         poll=lambda self, obj: obj.type == "LATTICE",
-    )
-    bpy.types.Scene.flexshape_lattice_shapekey_name = bpy.props.StringProperty()
-    bpy.types.Scene.flexshape_lattice_auto_remove = bpy.props.BoolProperty(default=True)
-    bpy.utils.register_class(FLEXSHAPE_LatticeListItem)
-    bpy.types.Scene.flexshape_lattice_list = bpy.props.CollectionProperty(
+    ),
+    "flexshape_lattice_shapekey_name": bpy.props.StringProperty(),
+    "flexshape_lattice_auto_remove": bpy.props.BoolProperty(default=True),
+    "flexshape_lattice_list": bpy.props.CollectionProperty(
         type=FLEXSHAPE_LatticeListItem
-    )
-    bpy.types.Scene.flexshape_lattice_list_index = bpy.props.IntProperty(default=0)
+    ),
+    "flexshape_lattice_list_index": bpy.props.IntProperty(default=0),
+}
 
-    bpy.types.Scene.flexshape_surface_deform_source = bpy.props.PointerProperty(
+
+SURFACE_DEFORM_PROPS = {
+    "flexshape_surface_deform_source": bpy.props.PointerProperty(
         type=bpy.types.Object,
         poll=lambda self, obj: obj.type == "MESH",
-    )
-    bpy.types.Scene.flexshape_surface_deform_shapekey_name = bpy.props.StringProperty()
-    bpy.types.Scene.flexshape_surface_deform_auto_remove = bpy.props.BoolProperty(
-        default=True
-    )
-    bpy.utils.register_class(FLEXSHAPE_SurfaceDeformShapekeyItem)
-    bpy.types.Scene.flexshape_surface_deform_shapekey_list = (
-        bpy.props.CollectionProperty(type=FLEXSHAPE_SurfaceDeformShapekeyItem)
-    )
-    bpy.types.Scene.flexshape_surface_deform_shapekey_list_index = (
-        bpy.props.IntProperty(default=0)
-    )
+        update=_update_source_shapekeys,
+    ),
+    "flexshape_surface_deform_shapekey_name": bpy.props.StringProperty(),
+    "flexshape_surface_deform_auto_remove": bpy.props.BoolProperty(default=True),
+    "flexshape_surface_deform_shapekey_list": bpy.props.CollectionProperty(
+        type=FLEXSHAPE_SurfaceDeformShapekeyItem
+    ),
+    "flexshape_surface_deform_shapekey_list_index": bpy.props.IntProperty(default=0),
+}
 
-    # noinspection PyUnusedLocal
-    def update_skip_prefixes(self, context):
-        skip_prefixes = [
-            prefix.strip()
-            for prefix in context.scene.flexshape_utils_skip_prefix.split(",")
-            if prefix.strip()
-        ]
-        return skip_prefixes
 
-    # noinspection PyTypeChecker
-    bpy.types.Scene.flexshape_utils_skip_prefix = bpy.props.StringProperty(
-        default="vrc,=====", update=update_skip_prefixes
-    )
-    bpy.types.Scene.flexshape_utils_shapekey_threshold = bpy.props.FloatProperty(
+UTILS_PROPS = {
+    "flexshape_utils_skip_prefix": bpy.props.StringProperty(
+        default="vrc,=====",
+        update=_update_skip_prefixes,
+    ),
+    "flexshape_utils_shapekey_threshold": bpy.props.FloatProperty(
         default=0.0001,
         precision=7,
-    )
+    ),
+}
 
-    bpy.types.Scene.flexshape_placeholder_json_file = bpy.props.StringProperty(
-        subtype="FILE_PATH",
-    )
-    bpy.types.Scene.flexshape_placeholder_face_mesh = bpy.props.PointerProperty(
+
+SHAPEKEY_REVERT_PROPS = {
+    "flexshape_shapekey_revert_target": bpy.props.PointerProperty(
         type=bpy.types.Object,
         poll=lambda self, obj: obj.type == "MESH",
-    )
+    ),
+    "flexshape_shapekey_revert_json_file": bpy.props.StringProperty(
+        subtype="FILE_PATH",
+    ),
+    "flexshape_shapekey_revert_delimiter": bpy.props.StringProperty(
+        default="-----",
+    ),
+    "flexshape_shapekey_revert_category_list": bpy.props.CollectionProperty(
+        type=FLEXSHAPE_BlendCategoryItem
+    ),
+    "flexshape_shapekey_revert_category_list_index": bpy.props.IntProperty(default=0),
+}
+
+PLACEHOLDER_PROPS = {
+    "flexshape_placeholder_face_mesh": bpy.props.PointerProperty(
+        type=bpy.types.Object,
+        poll=lambda self, obj: obj.type == "MESH",
+    ),
+}
+
+
+scene_properties = {
+    **ARMATURE_PROPS,
+    **LATTICE_PROPS,
+    **SURFACE_DEFORM_PROPS,
+    **UTILS_PROPS,
+    **PLACEHOLDER_PROPS,
+    **SHAPEKEY_REVERT_PROPS,
+}
+
+
+def register():
+    for cls in property_groups:
+        bpy.utils.register_class(cls)
+
+    for prop_name, prop_value in scene_properties.items():
+        setattr(bpy.types.Scene, prop_name, prop_value)
 
 
 def unregister():
-    del bpy.types.Scene.flexshape_armature_source
-    del bpy.types.Scene.flexshape_armature_shapekey_name
-    bpy.utils.unregister_class(FLEXSHAPE_ArmatureListItem)
-    del bpy.types.Scene.flexshape_armature_list
-    del bpy.types.Scene.flexshape_armature_list_index
+    for prop_name in scene_properties.keys():
+        delattr(bpy.types.Scene, prop_name)
 
-    del bpy.types.Scene.flexshape_lattice_source
-    del bpy.types.Scene.flexshape_lattice_shapekey_name
-    del bpy.types.Scene.flexshape_lattice_auto_remove
-    bpy.utils.unregister_class(FLEXSHAPE_LatticeListItem)
-    del bpy.types.Scene.flexshape_lattice_list
-    del bpy.types.Scene.flexshape_lattice_list_index
-
-    del bpy.types.Scene.flexshape_surface_deform_source
-    del bpy.types.Scene.flexshape_surface_deform_shapekey_name
-    del bpy.types.Scene.flexshape_surface_deform_auto_remove
-    bpy.utils.unregister_class(FLEXSHAPE_SurfaceDeformShapekeyItem)
-    del bpy.types.Scene.flexshape_surface_deform_shapekey_list
-    del bpy.types.Scene.flexshape_surface_deform_shapekey_list_index
-
-    del bpy.types.Scene.flexshape_utils_skip_prefix
-    del bpy.types.Scene.flexshape_utils_shapekey_threshold
-
-    del bpy.types.Scene.flexshape_placeholder_json_file
-    del bpy.types.Scene.flexshape_placeholder_face_mesh
+    for cls in reversed(property_groups):
+        bpy.utils.unregister_class(cls)

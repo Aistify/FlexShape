@@ -26,7 +26,7 @@ class FLEXSHAPE_PT_utils(bpy.types.Panel):
         )
         remove_zero_impact_shapekey_box.prop(
             context.scene,
-            "flexshape_util_shapekey_threshold",
+            "flexshape_utils_shapekey_threshold",
             text="Vertex Diff Threshold",
             icon_value=0,
             emboss=True,

@@ -12,6 +12,7 @@ if "armature_operators" in locals():
         "surface_deform_operators",
         "surface_deform_list_operators",
         "utils_operators",
+        "shapekey_revert_operators",
     ]
 
     for submodule_name in submodules:
@@ -28,24 +29,27 @@ from . import (
     surface_deform_operators,
     surface_deform_list_operators,
     utils_operators,
+    shapekey_revert_operators,
+)
+
+
+operators = (
+    armature_operators,
+    armature_list_operators,
+    lattice_operators,
+    lattice_list_operators,
+    surface_deform_operators,
+    surface_deform_list_operators,
+    utils_operators,
+    shapekey_revert_operators,
 )
 
 
 def register():
-    armature_operators.register()
-    armature_list_operators.register()
-    lattice_operators.register()
-    lattice_list_operators.register()
-    surface_deform_operators.register()
-    surface_deform_list_operators.register()
-    utils_operators.register()
+    for module in operators:
+        module.register()
 
 
 def unregister():
-    armature_operators.unregister()
-    armature_list_operators.unregister()
-    lattice_operators.unregister()
-    lattice_list_operators.unregister()
-    surface_deform_operators.unregister()
-    surface_deform_list_operators.unregister()
-    utils_operators.unregister()
+    for module in reversed(operators):
+        module.unregister()

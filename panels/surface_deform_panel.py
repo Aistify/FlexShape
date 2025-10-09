@@ -76,7 +76,7 @@ class FLEXSHAPE_PT_surface_deform(bpy.types.Panel):
 
         surface_deform_box.operator(
             "flexshape.load_source_shapekeys",
-            text="Load Shapekeys from Source",
+            text="Reload Shapekeys from Source",
             icon="FILE_REFRESH",
             emboss=True,
         )
