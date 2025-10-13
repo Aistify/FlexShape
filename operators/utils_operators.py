@@ -105,9 +105,6 @@ class FLEXSHAPE_OT_UtilsRemoveZeroShapekeys(bpy.types.Operator):
 
         return {"FINISHED"}
 
-    def invoke(self, context, _):
-        return self.execute(context)
-
 
 # noinspection PyPep8Naming
 class FLEXSHAPE_OT_UtilsSetShapekey0(bpy.types.Operator):
@@ -123,6 +120,13 @@ class FLEXSHAPE_OT_UtilsSetShapekey0(bpy.types.Operator):
         default=True,
     )
 
+    # noinspection PyTypeHints
+    use_surface_deform_source: bpy.props.BoolProperty(
+        name="Use Surface Deform Source",
+        description="Process surface deform source?",
+        default=False,
+    )
+
     # noinspection PyMethodMayBeStatic
     def _set_shapekey_to_0(self, obj):
         if not obj.data.shape_keys:
@@ -131,12 +135,20 @@ class FLEXSHAPE_OT_UtilsSetShapekey0(bpy.types.Operator):
             shapekey.value = 0.0
 
     def execute(self, context):
-        target_objects = get_meshes_from_selection(self, context)
-        if target_objects is None:
-            return {"CANCELLED"}
+        if not self.use_surface_deform_source:
+            target_objects = get_meshes_from_selection(self, context)
+            if target_objects is None:
+                return {"CANCELLED"}
 
-        for obj in target_objects:
-            self._set_shapekey_to_0(obj)
+            for obj in target_objects:
+                self._set_shapekey_to_0(obj)
+        else:
+            surface_deform_source = context.scene.flexshape_surface_deform_source
+            if surface_deform_source is None:
+                self.report({"ERROR"}, "No Surface Deform Source Mesh Set")
+                return {"CANCELLED"}
+
+            self._set_shapekey_to_0(surface_deform_source)
 
         return {"FINISHED"}
 

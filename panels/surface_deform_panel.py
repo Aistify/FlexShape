@@ -31,7 +31,7 @@ class FLEXSHAPE_PT_surface_deform(bpy.types.Panel):
             text="Set Source Shapekeys to 0",
             icon="SHAPEKEY_DATA",
             emboss=True,
-        ).use_selection = False
+        ).use_surface_deform_source = True
 
         surface_deform_box.label(
             text="Surface Deform Operations",
@@ -74,15 +74,10 @@ class FLEXSHAPE_PT_surface_deform(bpy.types.Panel):
             emboss=True,
         )
 
-        surface_deform_box.operator(
-            "flexshape.load_source_shapekeys",
-            text="Reload Shapekeys from Source",
-            icon="FILE_REFRESH",
-            emboss=True,
+        surface_deform_box.label(
+            text="Mass Copy Shapekeys with Surface Deforms",
+            icon="MOD_SUBSURF",
         )
-
-        surface_deform_box.label(text="Shapekeys to Copy", icon="SHAPEKEY_DATA")
-
         row = surface_deform_box.row()
         row.template_list(
             "FLEXSHAPE_UL_SurfaceDeformShapekeyList",
@@ -97,7 +92,12 @@ class FLEXSHAPE_PT_surface_deform(bpy.types.Panel):
         col = row.column(align=True)
         col.operator("flexshape.select_all_shapekeys", icon="CHECKBOX_HLT", text="")
         col.operator("flexshape.deselect_all_shapekeys", icon="CHECKBOX_DEHLT", text="")
-
+        surface_deform_box.operator(
+            "flexshape.load_source_shapekeys",
+            text="Reload Shapekeys from Source",
+            icon="FILE_REFRESH",
+            emboss=True,
+        )
         surface_deform_box.operator(
             "flexshape.surface_deform_mass_save",
             text="Save Selected Shapekeys To Selection",

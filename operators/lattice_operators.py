@@ -1,10 +1,24 @@
 ﻿import bpy
 
+from ..common.operators import FLEXSHAPE_OT_MeshSelectionOperatorBase
 from ..common.functions import remove_duplicate_shapekey
 from ..common.functions import OverwriteWarnOperator
 
 
 FLEXSHAPE_LATTICE_NAME = "FLEXSHAPE_LATTICE"
+
+
+def add_flexshape_lattice(obj, source_lattice):
+    lattice = obj.modifiers.new(FLEXSHAPE_LATTICE_NAME, "LATTICE")
+    lattice.object = source_lattice
+
+
+def remove_flexshape_lattice(obj):
+    if obj.modifiers is not None:
+        for modifier in obj.modifiers:
+            if modifier.type == "LATTICE" and modifier.name == FLEXSHAPE_LATTICE_NAME:
+                bpy.context.view_layer.objects.active = obj
+                bpy.ops.object.modifier_remove(modifier=modifier.name)
 
 
 def save_lattice_as_shapekey(obj, shapekey_name, cleanup_modifier):
@@ -23,19 +37,6 @@ def save_lattice_as_shapekey(obj, shapekey_name, cleanup_modifier):
     return False
 
 
-def remove_flexshape_lattice(obj):
-    if obj.modifiers is not None:
-        for modifier in obj.modifiers:
-            if modifier.type == "LATTICE" and modifier.name == FLEXSHAPE_LATTICE_NAME:
-                bpy.context.view_layer.objects.active = obj
-                bpy.ops.object.modifier_remove(modifier=modifier.name)
-
-
-def add_flexshape_lattice(obj, source_lattice):
-    lattice = obj.modifiers.new(FLEXSHAPE_LATTICE_NAME, "LATTICE")
-    lattice.object = source_lattice
-
-
 def quick_save_lattice_as_shapekey(obj, source_lattice, shapekey_name=""):
     if shapekey_name == "":
         if source_lattice is None:
@@ -45,35 +46,16 @@ def quick_save_lattice_as_shapekey(obj, source_lattice, shapekey_name=""):
     remove_flexshape_lattice(obj)
     add_flexshape_lattice(obj, source_lattice)
     save_lattice_as_shapekey(obj, shapekey_name, False)
-
     return True
 
 
 # noinspection PyPep8Naming
-class FLEXSHAPE_OT_LatticeOperatorBase(bpy.types.Operator):
-    bl_options = {"REGISTER", "UNDO"}
-
-    def execute(self, context):
-        mesh_selection = [obj for obj in context.selected_objects if obj.type == "MESH"]
-
-        if not mesh_selection:
-            self.report({"ERROR"}, "No Meshes Selected")
-            return {"CANCELLED"}
-
-        self.process_lattice(context, mesh_selection)
-        return {"FINISHED"}
-
-    def process_lattice(self, context, mesh_selection) -> None:
-        raise NotImplementedError
-
-
-# noinspection PyPep8Naming
-class FLEXSHAPE_OT_AddLattice(FLEXSHAPE_OT_LatticeOperatorBase):
+class FLEXSHAPE_OT_AddLattice(FLEXSHAPE_OT_MeshSelectionOperatorBase):
     bl_idname = "flexshape.add_lattice"
     bl_label = "Add Lattice"
     bl_description = "Add FlexShape Lattice to Selected Meshes"
 
-    def process_lattice(self, context, mesh_selection):
+    def process_objects(self, context, mesh_selection):
         source_lattice = context.scene.flexshape_lattice_source
 
         if source_lattice is None:
@@ -88,18 +70,18 @@ class FLEXSHAPE_OT_AddLattice(FLEXSHAPE_OT_LatticeOperatorBase):
 
 
 # noinspection PyPep8Naming
-class FLEXSHAPE_OT_RemoveLattice(FLEXSHAPE_OT_LatticeOperatorBase):
+class FLEXSHAPE_OT_RemoveLattice(FLEXSHAPE_OT_MeshSelectionOperatorBase):
     bl_idname = "flexshape.remove_lattice"
     bl_label = "Remove Lattice"
     bl_description = "Remove FlexShape Lattice Modifier from Selected Meshes"
 
-    def process_lattice(self, context, mesh_selection):
+    def process_objects(self, context, mesh_selection):
         for obj in mesh_selection:
             remove_flexshape_lattice(obj)
 
 
 # noinspection PyPep8Naming
-class FLEXSHAPE_OT_LatticeSaveAsShapekey(FLEXSHAPE_OT_LatticeOperatorBase):
+class FLEXSHAPE_OT_LatticeSaveAsShapekey(FLEXSHAPE_OT_MeshSelectionOperatorBase):
     bl_idname = "flexshape.lattice_save_as_shapekey"
     bl_label = "Save Lattice as Shapekey"
     bl_description = "Save FlexShape Lattice Modifier as Shapekey to Selected Meshes"
@@ -122,9 +104,8 @@ class FLEXSHAPE_OT_LatticeSaveAsShapekey(FLEXSHAPE_OT_LatticeOperatorBase):
                     "Failed to save shapekey for one or more objects",
                 )
                 print(f"Failed to save shapekey for {obj.name}")
-                continue
 
-    def process_lattice(self, context, mesh_selection):
+    def process_objects(self, context, mesh_selection):
         cleanup_modifier = context.scene.flexshape_lattice_auto_remove
 
         shapekey_name = context.scene.flexshape_lattice_shapekey_name
@@ -136,7 +117,7 @@ class FLEXSHAPE_OT_LatticeSaveAsShapekey(FLEXSHAPE_OT_LatticeOperatorBase):
 
         if self._check_for_existing_shapekeys(mesh_selection, shapekey_name):
             OverwriteWarnOperator.register_with_callback(
-                lambda ctx: self._process_all_objects(
+                lambda _: self._process_all_objects(
                     mesh_selection, shapekey_name, cleanup_modifier
                 )
             )
@@ -149,13 +130,13 @@ class FLEXSHAPE_OT_LatticeSaveAsShapekey(FLEXSHAPE_OT_LatticeOperatorBase):
 
 
 # noinspection PyPep8Naming
-class FLEXSHAPE_OT_LatticeQuickSave(FLEXSHAPE_OT_LatticeOperatorBase):
+class FLEXSHAPE_OT_LatticeQuickSave(FLEXSHAPE_OT_MeshSelectionOperatorBase):
     bl_idname = "flexshape.lattice_quick_save"
     bl_label = "Quick Save Shape Key"
     bl_description = "Add Lattice -> Save As Shape Key"
 
     # noinspection PyMethodMayBeStatic
-    def process_lattice(self, context, mesh_selection):
+    def process_objects(self, context, mesh_selection):
         source_lattice = context.scene.flexshape_lattice_source
         shapekey_name = context.scene.flexshape_lattice_shapekey_name
 
@@ -164,19 +145,28 @@ class FLEXSHAPE_OT_LatticeQuickSave(FLEXSHAPE_OT_LatticeOperatorBase):
             return {"CANCELLED"}
 
         for obj in mesh_selection:
-            quick_save_lattice_as_shapekey(obj, source_lattice, shapekey_name)
+            result = quick_save_lattice_as_shapekey(
+                obj, source_lattice.lattice, shapekey_name
+            )
+
+            if not result:
+                self.report(
+                    {"WARNING"},
+                    "Failed to save shapekey for one or more objects",
+                )
+                print(f"Failed to save shapekey for {obj.name}")
 
         return {"FINISHED"}
 
 
 # noinspection PyPep8Naming
-class FLEXSHAPE_OT_LatticeMassSave(FLEXSHAPE_OT_LatticeOperatorBase):
+class FLEXSHAPE_OT_LatticeMassSave(FLEXSHAPE_OT_MeshSelectionOperatorBase):
     bl_idname = "flexshape.lattice_mass_save"
     bl_label = "Mass Save Shape Key"
     bl_description = "For Each In List: Add Lattice -> Save As Shape Key"
 
     # noinspection PyMethodMayBeStatic
-    def process_lattice(self, context, mesh_selection):
+    def process_objects(self, context, mesh_selection):
         lattice_list = context.scene.flexshape_lattice_list
 
         if len(lattice_list) == 0:

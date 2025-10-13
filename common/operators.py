@@ -22,14 +22,36 @@ class FLEXSHAPE_OT_SelectJsonFile(bpy.types.Operator):
         context.scene.flexshape_placeholder_json_file = self.filepath
         return {"FINISHED"}
 
-    def invoke(self, context, _):
-        context.window_manager.fileselect_add(self)
-        return {"RUNNING_MODAL"}
+
+# noinspection PyPep8Naming
+class FLEXSHAPE_OT_MeshSelectionOperatorBase(bpy.types.Operator):
+    bl_options = {"REGISTER", "UNDO"}
+
+    def execute(self, context):
+        mesh_selection = [obj for obj in context.selected_objects if obj.type == "MESH"]
+
+        if not mesh_selection:
+            self.report({"ERROR"}, "No Meshes Selected")
+            return {"CANCELLED"}
+
+        self.process_objects(context, mesh_selection)
+        return {"FINISHED"}
+
+    def process_objects(self, context, mesh_selection):
+        raise NotImplementedError
+
+
+classes = (
+    FLEXSHAPE_OT_SelectJsonFile,
+    FLEXSHAPE_OT_MeshSelectionOperatorBase,
+)
 
 
 def register():
-    bpy.utils.register_class(FLEXSHAPE_OT_SelectJsonFile)
+    for cls in classes:
+        bpy.utils.register_class(cls)
 
 
 def unregister():
-    bpy.utils.unregister_class(FLEXSHAPE_OT_SelectJsonFile)
+    for cls in reversed(classes):
+        bpy.utils.unregister_class(cls)

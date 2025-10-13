@@ -1,13 +1,6 @@
 ﻿import bpy
 
 
-def show_message_box(message="", title="Message Box", icon="INFO"):
-    def draw(self, _):
-        self.layout.label(text=message)
-
-    bpy.context.window_manager.popup_menu(draw, title=title, icon=icon)
-
-
 def remove_duplicate_shapekey(obj, shapekey_name):
     if obj.data.shape_keys is not None:
         key_blocks = obj.data.shape_keys.key_blocks

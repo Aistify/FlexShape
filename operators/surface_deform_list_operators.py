@@ -3,13 +3,10 @@ import bpy
 
 # noinspection PyPep8Naming
 class FLEXSHAPE_UL_SurfaceDeformShapekeyList(bpy.types.UIList):
-    def draw_item(self, _, layout, __, item, ___, ____, _____):
+    def draw_item(self, _, layout, __, item, ___, ____, _____, ______):
         if self.layout_type in {"DEFAULT", "COMPACT"}:
             layout.prop(item, "enabled", text="")
             layout.label(text=item.name, icon="SHAPEKEY_DATA")
-        elif self.layout_type == "GRID":
-            layout.alignment = "CENTER"
-            layout.prop(item, "enabled", text="")
 
 
 # noinspection PyPep8Naming
