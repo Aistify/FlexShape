@@ -230,8 +230,6 @@ class FLEXSHAPE_OT_ArmatureQuickSave(FLEXSHAPE_OT_ArmatureOperatorBase):
             context, source_armature, target_armatures, shapekey_name
         )
 
-        return {"FINISHED"}
-
 
 # noinspection PyPep8Naming
 class FLEXSHAPE_OT_ArmatureMassSave(FLEXSHAPE_OT_ArmatureOperatorBase):
@@ -256,11 +254,9 @@ class FLEXSHAPE_OT_ArmatureMassSave(FLEXSHAPE_OT_ArmatureOperatorBase):
             if not result:
                 self.report(
                     {"WARNING"},
-                    f"Failed to save shapekey for {armature_list_item.armature.name}",
+                    f"Failed to save shapekey for one or more armatures sources",
                 )
-                continue
-
-        return {"FINISHED"}
+                print(f"Failed to save shapekey for {armature_list_item.armature.name}")
 
 
 classes = (
