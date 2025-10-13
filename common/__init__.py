@@ -4,9 +4,7 @@ import importlib
 if "operators" in locals():
     package_name = __package__
 
-    submodules = [
-        "operators",
-    ]
+    submodules = ["operators", "list_crud_operators"]
 
     for submodule_name in submodules:
         full_module_name = f"{package_name}.{submodule_name}"
@@ -16,12 +14,17 @@ if "operators" in locals():
 
 from . import (
     operators,
+    list_crud_operators,
 )
+
+common = (operators,)
 
 
 def register():
-    operators.register()
+    for module in common:
+        module.register()
 
 
 def unregister():
-    operators.unregister()
+    for module in reversed(common):
+        module.unregister()

@@ -1,8 +1,10 @@
 ﻿import bpy
 
-from ..common.functions import OverwriteWarnOperator
-from ..common.functions import remove_duplicate_shapekey
-from ..common.functions import show_message_box
+from ..common.functions import (
+    OverwriteWarnOperator,
+    get_meshes_from_selection,
+    remove_duplicate_shapekey,
+)
 
 
 def copy_pose_relations(armature, source_pose_bones):
@@ -68,8 +70,7 @@ def quick_save_armature_as_shapekey(
     context, source_armature, target_armatures, shapekey_name=""
 ):
     if source_armature is None:
-        show_message_box("Source Armature was not found.")
-        return {"CANCELLED"}
+        return False
 
     if shapekey_name == "":
         shapekey_name = source_armature.name
@@ -93,221 +94,171 @@ def quick_save_armature_as_shapekey(
 
 
 # noinspection PyPep8Naming
-class FLEXSHAPE_OT_CopyPoseRelations(bpy.types.Operator):
-    bl_idname = "flexshape.copy_pose_relations"
-    bl_label = "Copy Pose Relations"
-    bl_description = ""
+class FLEXSHAPE_OT_ArmatureOperatorBase(bpy.types.Operator):
     bl_options = {"REGISTER", "UNDO"}
 
-    # noinspection PyMethodMayBeStatic
-    def execute(self, _):
-        source_armature = bpy.context.scene.flexshape_armature_source
+    requires_source = True
 
-        if source_armature is None:
-            show_message_box("Source Armature was not found.")
-            return {"CANCELLED"}
-
-        source_pose_bones = source_armature.pose.bones
-
-        for target_armature in bpy.context.selected_objects:
-            if target_armature.type != "ARMATURE":
-                continue
-            if target_armature == source_armature:
-                continue
-
-            copy_pose_relations(target_armature, source_pose_bones)
-
-        return {"FINISHED"}
-
-    def invoke(self, context, _):
-        return self.execute(context)
-
-
-# noinspection PyPep8Naming
-class FLEXSHAPE_OT_CopyPoseTransforms(bpy.types.Operator):
-    bl_idname = "flexshape.copy_pose_transforms"
-    bl_label = "Copy Pose Transforms"
-    bl_description = ""
-    bl_options = {"REGISTER", "UNDO"}
-
-    # noinspection PyMethodMayBeStatic
     def execute(self, context):
         source_armature = context.scene.flexshape_armature_source
 
-        if source_armature is None:
-            show_message_box("Source Armature was not found.")
+        if self.requires_source and source_armature is None:
+            self.report({"ERROR"}, "No Source Armature Set")
             return {"CANCELLED"}
 
-        source_pose_bones = source_armature.pose.bones
+        armature_selection = [
+            obj for obj in context.selected_objects if obj.type == "ARMATURE"
+        ]
 
-        for target_armature in bpy.context.selected_objects:
-            if target_armature.type != "ARMATURE":
-                continue
-            if target_armature == source_armature:
-                continue
+        if len(armature_selection) == 0:
+            self.report({"ERROR"}, "No Armatures Selected")
+            return {"CANCELLED"}
 
-            copy_pose_transforms(target_armature, source_pose_bones)
-
+        self.process_armatures(context, source_armature, armature_selection)
         return {"FINISHED"}
 
-    def invoke(self, context, _):
-        return self.execute(context)
+    def process_armatures(self, context, source_armature, target_armatures):
+        raise NotImplementedError
 
 
 # noinspection PyPep8Naming
-class FLEXSHAPE_OT_ClearPoseTransforms(bpy.types.Operator):
+class FLEXSHAPE_OT_CopyPoseRelations(FLEXSHAPE_OT_ArmatureOperatorBase):
+    bl_idname = "flexshape.copy_pose_relations"
+    bl_label = "Copy Pose Relations"
+    bl_description = "Copy Pose Relations From Source To Selected Armatures"
+
+    requires_source = True
+
+    def process_armatures(self, context, source_armature, target_armatures):
+        source_pose_bones = source_armature.pose.bones
+        for target_armature in target_armatures:
+            copy_pose_relations(target_armature, source_pose_bones)
+
+
+# noinspection PyPep8Naming
+class FLEXSHAPE_OT_CopyPoseTransforms(FLEXSHAPE_OT_ArmatureOperatorBase):
+    bl_idname = "flexshape.copy_pose_transforms"
+    bl_label = "Copy Pose Transforms"
+    bl_description = "Copy Pose Transforms From Source To Selected Armatures"
+
+    requires_source = True
+
+    def process_armatures(self, context, source_armature, target_armatures):
+        source_pose_bones = source_armature.pose.bones
+        for target_armature in target_armatures:
+            copy_pose_transforms(target_armature, source_pose_bones)
+
+
+# noinspection PyPep8Naming
+class FLEXSHAPE_OT_ClearPoseTransforms(FLEXSHAPE_OT_ArmatureOperatorBase):
     bl_idname = "flexshape.clear_pose_transforms"
     bl_label = "Clear Pose Transforms"
-    bl_description = ""
-    bl_options = {"REGISTER", "UNDO"}
+    bl_description = "Clear Pose Transforms From Selected Armatures"
+
+    requires_source = False
 
     # noinspection PyMethodMayBeStatic
-    def execute(self, context):
-        original_active = context.active_object
-
-        for target_armature in bpy.context.selected_objects:
-            if target_armature.type != "ARMATURE":
-                continue
-
+    def process_armatures(self, context, _, target_armatures):
+        for target_armature in target_armatures:
             clear_pose_transforms(context, target_armature)
-
-        context.view_layer.objects.active = original_active
-
-        return {"FINISHED"}
-
-    def invoke(self, context, _):
-        return self.execute(context)
 
 
 # noinspection PyPep8Naming
 class FLEXSHAPE_OT_SaveArmatureDeformAsShapekey(bpy.types.Operator):
     bl_idname = "flexshape.armature_save_as_shapekey"
-    bl_label = "Save Armature Deform as Shapekey"
-    bl_description = ""
+    bl_label = "Save Armature Deform"
+    bl_description = "Save Current Armature Deform as a Shapekey"
     bl_options = {"REGISTER", "UNDO"}
 
     # noinspection PyTypeHints
     use_selection: bpy.props.BoolProperty(
+        name="Use Selection",
+        description="Process only selected mesh objects?",
         default=True,
     )
 
     # noinspection PyMethodMayBeStatic
-    def _check_for_existing_shapekeys(self, context, shapekey_name):
-        def __get_meshes():
-            for obj in context.selected_objects:
-                if obj.type == "MESH":
-                    yield obj
-                elif obj.type == "ARMATURE":
-                    for child in obj.children:
-                        if child.type == "MESH":
-                            yield child
-
+    def _check_for_existing_shapekeys(self, target_objects, shapekey_name):
         return any(
             obj.data.shape_keys and shapekey_name in obj.data.shape_keys.key_blocks
-            for obj in __get_meshes()
+            for obj in target_objects
         )
 
-    def _process_all_objects(self, context, shapekey_name):
-        target_objects = []
-
-        if self.use_selection:
-            target_objects = context.selected_objects
-        else:
-            for armature in context.selected_objects:
-                if armature.type == "ARMATURE":
-                    target_objects.extend(armature.children)
-
+    # noinspection PyMethodMayBeStatic
+    def _process_all_objects(self, target_objects, shapekey_name):
         for obj in target_objects:
-            if obj.type != "MESH":
-                continue
-
             save_armature_deform_as_shapekey(obj, shapekey_name)
 
     def execute(self, context):
         shapekey_name = context.scene.flexshape_armature_shapekey_name
-        active_obj = context.active_object
-        selected_objects = [obj for obj in context.selected_objects]
 
         if shapekey_name == "":
+            if not context.scene.flexshape_armature_source:
+                self.report({"ERROR"}, "Source Armature or Shapekey name was not found")
+                return {"CANCELLED"}
             shapekey_name = context.scene.flexshape_armature_source.name
 
-        if self._check_for_existing_shapekeys(context, shapekey_name):
+        target_objects = get_meshes_from_selection(self, context)
+        if target_objects is None:
+            return {"CANCELLED"}
+
+        if self._check_for_existing_shapekeys(target_objects, shapekey_name):
             OverwriteWarnOperator.register_with_callback(
-                lambda ctx: self._process_all_objects(ctx, shapekey_name)
+                lambda ctx: self._process_all_objects(target_objects, shapekey_name)
             )
             # noinspection PyUnresolvedReferences
             bpy.ops.flexshape.overwrite_dialogue("INVOKE_DEFAULT")
         else:
-            self._process_all_objects(context, shapekey_name)
-
-        bpy.ops.object.select_all(action="DESELECT")
-        for obj in selected_objects:
-            obj.select_set(True)
-        context.view_layer.objects.active = active_obj
+            self._process_all_objects(target_objects, shapekey_name)
 
         return {"FINISHED"}
 
-    def invoke(self, context, _):
-        return self.execute(context)
-
 
 # noinspection PyPep8Naming
-class FLEXSHAPE_OT_ArmatureQuickSave(bpy.types.Operator):
+class FLEXSHAPE_OT_ArmatureQuickSave(FLEXSHAPE_OT_ArmatureOperatorBase):
     bl_idname = "flexshape.armature_quick_save"
     bl_label = "Quick Save Shape Key"
-    bl_description = (
-        "Copy Relations -> Copy Transforms -> Save As Shape Key -> Clear Transforms"
-    )
-    bl_options = {"REGISTER", "UNDO"}
+    bl_description = "Copy Relations -> Copy Transforms -> Save As Shape Key -> Clear Transforms For Selected Armatures"
+
+    requires_source = True
 
     # noinspection PyMethodMayBeStatic
-    def execute(self, context):
-        active_obj = context.active_object
-        selected_objects = [
-            obj for obj in context.selected_objects if obj.type == "ARMATURE"
-        ]
-
+    def process_armatures(self, context, source_armature, target_armatures):
         shapekey_name = context.scene.flexshape_armature_shapekey_name
-        source_armature = bpy.context.scene.flexshape_armature_source
 
         quick_save_armature_as_shapekey(
-            context, source_armature, selected_objects, shapekey_name
+            context, source_armature, target_armatures, shapekey_name
         )
-
-        for obj in selected_objects:
-            obj.select_set(True)
-        context.view_layer.objects.active = active_obj
 
         return {"FINISHED"}
 
 
 # noinspection PyPep8Naming
-class FLEXSHAPE_OT_ArmatureMassSave(bpy.types.Operator):
+class FLEXSHAPE_OT_ArmatureMassSave(FLEXSHAPE_OT_ArmatureOperatorBase):
     bl_idname = "flexshape.armature_mass_save"
     bl_label = "Mass Save Shape Key"
-    bl_description = "For Each In List: Copy Relations -> Copy Transforms -> Save As Shape Key -> Clear Transforms"
-    bl_options = {"REGISTER", "UNDO"}
+    bl_description = "For Each In List: Copy Relations -> Copy Transforms -> Save As Shape Key -> Clear Transforms For Selected Armatures"
+
+    requires_source = False
 
     # noinspection PyMethodMayBeStatic
-    def execute(self, context):
-        active_obj = context.active_object
-        selected_objects = [
-            obj for obj in context.selected_objects if obj.type == "ARMATURE"
-        ]
-
+    def process_armatures(self, context, _, target_armatures):
         armature_list = context.scene.flexshape_armature_list
 
         for armature_list_item in armature_list:
-            quick_save_armature_as_shapekey(
+            result = quick_save_armature_as_shapekey(
                 context,
                 armature_list_item.armature,
-                selected_objects,
+                target_armatures,
                 armature_list_item.armature.name,
             )
 
-        for obj in selected_objects:
-            obj.select_set(True)
-        context.view_layer.objects.active = active_obj
+            if not result:
+                self.report(
+                    {"WARNING"},
+                    f"Failed to save shapekey for {armature_list_item.armature.name}",
+                )
+                continue
 
         return {"FINISHED"}
 

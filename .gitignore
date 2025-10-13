@@ -2,3 +2,6 @@
 .idea/
 __pycache__/
 **/__pycache__/
+/operators/shapekey_revert_list_operators.py
+/operators/shapekey_revert_operators.py
+/panels/shapekey_revert_panel.py

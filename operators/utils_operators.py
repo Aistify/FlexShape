@@ -1,6 +1,7 @@
 ﻿import bpy
 import numpy as np
-from ..common.functions import show_message_box
+
+from ..common.functions import get_meshes_from_selection
 
 
 # noinspection PyPep8Naming
@@ -12,6 +13,8 @@ class FLEXSHAPE_OT_UtilsRemoveZeroShapekeys(bpy.types.Operator):
 
     # noinspection PyTypeHints
     use_selection: bpy.props.BoolProperty(
+        name="Use Selection",
+        description="Process only selected mesh objects?",
         default=True,
     )
 
@@ -61,11 +64,11 @@ class FLEXSHAPE_OT_UtilsRemoveZeroShapekeys(bpy.types.Operator):
         else:
             active_obj = context.active_object
             if not active_obj:
-                show_message_box("No active object selected.")
-                return {"CANCELLED"}
+                self.report({"ERROR"}, "No active object selected")
+                return False
             if active_obj.type != "ARMATURE":
-                show_message_box("Active object must be an armature.")
-                return {"CANCELLED"}
+                self.report({"ERROR"}, "Active object must be an armature.")
+                return False
 
             target_objects = active_obj.children
 
@@ -91,13 +94,14 @@ class FLEXSHAPE_OT_UtilsRemoveZeroShapekeys(bpy.types.Operator):
                 {"INFO"},
                 f"Deleted {total_deleted} shape keys across {len(target_objects)} objects",
             )
-            return {"FINISHED"}
+            return True
         else:
             self.report({"INFO"}, "No shape keys were deleted")
-            return {"FINISHED"}
+            return True
 
     def execute(self, context):
-        self._process_all_objects(context)
+        if not self._process_all_objects(context):
+            return {"CANCELLED"}
 
         return {"FINISHED"}
 
@@ -108,44 +112,33 @@ class FLEXSHAPE_OT_UtilsRemoveZeroShapekeys(bpy.types.Operator):
 # noinspection PyPep8Naming
 class FLEXSHAPE_OT_UtilsSetShapekey0(bpy.types.Operator):
     bl_idname = "flexshape.utils_set_shapekey_0"
-    bl_label = "utils_set_shapekey_0"
-    bl_description = ""
+    bl_label = "Set Shapekeys to 0"
+    bl_description = "Set Selected Objects Shapekeys to 0"
     bl_options = {"REGISTER", "UNDO"}
 
     # noinspection PyTypeHints
     use_selection: bpy.props.BoolProperty(
+        name="Use Selection",
+        description="Process only selected mesh objects?",
         default=True,
     )
 
     # noinspection PyMethodMayBeStatic
-    def _process_object(self, obj):
+    def _set_shapekey_to_0(self, obj):
+        if not obj.data.shape_keys:
+            return
         for shapekey in obj.data.shape_keys.key_blocks[1:]:
             shapekey.value = 0.0
 
-        return True
-
-    def _process_all_objects(self, context):
-        if self.use_selection:
-            target_objects = context.selected_objects
-        else:
-            target_objects = [context.scene.flexshape_surface_deform_source]
+    def execute(self, context):
+        target_objects = get_meshes_from_selection(self, context)
+        if target_objects is None:
+            return {"CANCELLED"}
 
         for obj in target_objects:
-            if obj.type != "MESH":
-                continue
-
-            if obj.data.shape_keys is None:
-                continue
-
-            self._process_object(obj)
-
-    def execute(self, context):
-        self._process_all_objects(context)
+            self._set_shapekey_to_0(obj)
 
         return {"FINISHED"}
-
-    def invoke(self, context, _):
-        return self.execute(context)
 
 
 classes = (FLEXSHAPE_OT_UtilsRemoveZeroShapekeys, FLEXSHAPE_OT_UtilsSetShapekey0)

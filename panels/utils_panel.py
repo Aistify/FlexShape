@@ -52,3 +52,9 @@ class FLEXSHAPE_PT_utils(bpy.types.Panel):
             icon="SHAPEKEY_DATA",
             emboss=True,
         ).use_selection = True
+        set_shapekey_to_zero_box.operator(
+            "flexshape.utils_set_shapekey_0",
+            text="Reset from Armature Children",
+            icon="SHAPEKEY_DATA",
+            emboss=True,
+        ).use_selection = False

@@ -55,3 +55,31 @@ class OverwriteWarnOperator(bpy.types.Operator):
 
     def cancel(self, _):
         bpy.utils.unregister_class(self.__class__)
+
+
+def get_meshes_from_selection(self, context):
+    def _get_all_meshes(obj):
+        meshes = []
+        for child in obj.children:
+            if child.type == "MESH":
+                meshes.append(child)
+            meshes.extend(_get_all_meshes(child))
+        return meshes
+
+    target_objects = []
+    if self.use_selection:
+        target_objects = [obj for obj in context.selected_objects if obj.type == "MESH"]
+        if len(target_objects) == 0:
+            self.report({"ERROR"}, "No Meshes Selected")
+            return None
+    else:
+        armature_selection = [
+            obj for obj in context.selected_objects if obj.type == "ARMATURE"
+        ]
+        if len(armature_selection) == 0:
+            self.report({"ERROR"}, "No Armatures Selected")
+            return None
+        for armature in armature_selection:
+            target_objects.extend(_get_all_meshes(armature))
+
+    return target_objects
