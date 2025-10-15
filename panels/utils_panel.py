@@ -32,13 +32,13 @@ class FLEXSHAPE_PT_utils(bpy.types.Panel):
             emboss=True,
         )
         remove_zero_impact_shapekey_box.operator(
-            "flexshape.utils_remove_zero_shapekeys",
+            "flexshape.utils_remove_empty_shapekeys",
             text="Remove from Selection",
             icon="SHAPEKEY_DATA",
             emboss=True,
         ).use_selection = True
         remove_zero_impact_shapekey_box.operator(
-            "flexshape.utils_remove_zero_shapekeys",
+            "flexshape.utils_remove_empty_shapekeys",
             text="Remove from Armature Children",
             icon="SHAPEKEY_DATA",
             emboss=True,

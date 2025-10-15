@@ -13,18 +13,18 @@ class FLEXSHAPE_UL_SurfaceDeformShapekeyList(bpy.types.UIList):
 class FLEXSHAPE_OT_LoadSourceShapekeys(bpy.types.Operator):
     bl_idname = "flexshape.load_source_shapekeys"
     bl_label = "Load Shapekeys"
-    bl_description = "Load shapekeys from source mesh"
+    bl_description = "Load Shapekey from Surface Deform Source Mesh"
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self, context):
         source = context.scene.flexshape_surface_deform_source
 
         if source is None or source.type != "MESH":
-            self.report({"WARNING"}, "No valid source mesh selected")
+            self.report({"WARNING"}, "No valid Surface Deform Source Mesh selected")
             return {"CANCELLED"}
 
         if not source.data.shape_keys:
-            self.report({"WARNING"}, "Source mesh has no shapekeys")
+            self.report({"WARNING"}, "Surface Deform Source Mesh has no Shapekey")
             return {"CANCELLED"}
 
         context.scene.flexshape_surface_deform_shapekey_list.clear()
@@ -38,7 +38,7 @@ class FLEXSHAPE_OT_LoadSourceShapekeys(bpy.types.Operator):
 
         self.report(
             {"INFO"},
-            f"Loaded {len(context.scene.flexshape_surface_deform_shapekey_list)} shapekeys",
+            f"Loaded {len(context.scene.flexshape_surface_deform_shapekey_list)} Shapekey",
         )
         return {"FINISHED"}
 
@@ -47,7 +47,7 @@ class FLEXSHAPE_OT_LoadSourceShapekeys(bpy.types.Operator):
 class FLEXSHAPE_OT_SelectAllShapekeys(bpy.types.Operator):
     bl_idname = "flexshape.select_all_shapekeys"
     bl_label = "Select All"
-    bl_description = "Select all shapekeys"
+    bl_description = "Select all Shapekeys"
     bl_options = {"REGISTER", "UNDO"}
 
     # noinspection PyMethodMayBeStatic
@@ -61,7 +61,7 @@ class FLEXSHAPE_OT_SelectAllShapekeys(bpy.types.Operator):
 class FLEXSHAPE_OT_DeselectAllShapekeys(bpy.types.Operator):
     bl_idname = "flexshape.deselect_all_shapekeys"
     bl_label = "Deselect All"
-    bl_description = "Deselect all shapekeys"
+    bl_description = "Deselect all Shapekeys"
     bl_options = {"REGISTER", "UNDO"}
 
     # noinspection PyMethodMayBeStatic

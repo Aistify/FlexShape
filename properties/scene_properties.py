@@ -12,9 +12,10 @@ def _update_skip_prefixes(_, context):
 def _update_source_shapekeys(_, context):
     if context.scene.flexshape_surface_deform_source:
         try:
+            # noinspection PyUnresolvedReferences
             bpy.ops.flexshape.load_source_shapekeys()
         except Exception as e:
-            print(f"Error loading shapekeys: {e}")
+            print(f"Error loading Shapekey: {e}")
     else:
         context.scene.flexshape_surface_deform_shapekey_list.clear()
 

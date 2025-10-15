@@ -6,8 +6,8 @@ from ..common.functions import get_meshes_from_selection
 
 # noinspection PyPep8Naming
 class FLEXSHAPE_OT_UtilsRemoveZeroShapekeys(bpy.types.Operator):
-    bl_idname = "flexshape.utils_remove_zero_shapekeys"
-    bl_label = "utils_remove_zero_shapekeys"
+    bl_idname = "flexshape.utils_remove_empty_shapekeys"
+    bl_label = "Remove Empty Shapekeys"
     bl_description = ""
     bl_options = {"REGISTER", "UNDO"}
 
@@ -49,7 +49,7 @@ class FLEXSHAPE_OT_UtilsRemoveZeroShapekeys(bpy.types.Operator):
             and not any(sk.name.startswith(prefix) for prefix in prefixes_to_skip)
         ]
 
-        print(f"Deleted shape keys from {obj.name}:")
+        print(f"Deleted Shapekey from {obj.name}:")
         for name in names_to_delete:
             print(f"  - {name}")
             obj.shape_key_remove(obj.data.shape_keys.key_blocks[name])
@@ -92,11 +92,11 @@ class FLEXSHAPE_OT_UtilsRemoveZeroShapekeys(bpy.types.Operator):
         if total_deleted > 0:
             self.report(
                 {"INFO"},
-                f"Deleted {total_deleted} shape keys across {len(target_objects)} objects",
+                f"Deleted {total_deleted} Shapekeys across {len(target_objects)} objects",
             )
             return True
         else:
-            self.report({"INFO"}, "No shape keys were deleted")
+            self.report({"INFO"}, "No Shapekey were deleted")
             return True
 
     def execute(self, context):
@@ -145,7 +145,7 @@ class FLEXSHAPE_OT_UtilsSetShapekey0(bpy.types.Operator):
         else:
             surface_deform_source = context.scene.flexshape_surface_deform_source
             if surface_deform_source is None:
-                self.report({"ERROR"}, "No Surface Deform Source Mesh Set")
+                self.report({"ERROR"}, "No Surface Deform Source Mesh set")
                 return {"CANCELLED"}
 
             self._set_shapekey_to_0(surface_deform_source)

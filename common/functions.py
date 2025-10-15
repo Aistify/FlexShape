@@ -63,14 +63,14 @@ def get_meshes_from_selection(self, context):
     if self.use_selection:
         target_objects = [obj for obj in context.selected_objects if obj.type == "MESH"]
         if len(target_objects) == 0:
-            self.report({"ERROR"}, "No Meshes Selected")
+            self.report({"ERROR"}, "No Meshes selected")
             return None
     else:
         armature_selection = [
             obj for obj in context.selected_objects if obj.type == "ARMATURE"
         ]
         if len(armature_selection) == 0:
-            self.report({"ERROR"}, "No Armatures Selected")
+            self.report({"ERROR"}, "No Armatures selected")
             return None
         for armature in armature_selection:
             target_objects.extend(_get_all_meshes(armature))

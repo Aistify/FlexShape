@@ -31,7 +31,7 @@ class FLEXSHAPE_OT_MeshSelectionOperatorBase(bpy.types.Operator):
         mesh_selection = [obj for obj in context.selected_objects if obj.type == "MESH"]
 
         if not mesh_selection:
-            self.report({"ERROR"}, "No Meshes Selected")
+            self.report({"ERROR"}, "No Meshes selected")
             return {"CANCELLED"}
 
         self.process_objects(context, mesh_selection)

@@ -27,18 +27,18 @@ class FLEXSHAPE_PT_lattice(bpy.types.Panel):
         lattice_box.label(text="Lattice Operations", icon="MOD_LATTICE")
         lattice_box.operator(
             "flexshape.add_lattice",
-            text="Add Lattice To Selection",
+            text="Add Lattice to Selection",
             icon="MODIFIER_ON",
             emboss=True,
         )
         lattice_box.operator(
             "flexshape.remove_lattice",
-            text="Remove From Selection",
+            text="Remove from Selection",
             icon="MODIFIER_OFF",
             emboss=True,
         )
 
-        lattice_box.label(text="Lattice To Shape Key", icon="SHAPEKEY_DATA")
+        lattice_box.label(text="Lattice to Shapekey", icon="SHAPEKEY_DATA")
         lattice_box.prop(
             context.scene,
             "flexshape_lattice_auto_remove",
@@ -55,7 +55,7 @@ class FLEXSHAPE_PT_lattice(bpy.types.Panel):
         )
         lattice_box.operator(
             "flexshape.lattice_save_as_shapekey",
-            text="Save As Shape Key",
+            text="Save as Shapekey",
             icon="SHAPEKEY_DATA",
             emboss=True,
         )
@@ -66,7 +66,7 @@ class FLEXSHAPE_PT_lattice(bpy.types.Panel):
             emboss=True,
         )
 
-        lattice_box.label(text="Mass Lattice To Shape Keys", icon="DOCUMENTS")
+        lattice_box.label(text="Mass Lattice to Shapekeys", icon="DOCUMENTS")
         row = lattice_box.row()
         row.template_list(
             "FLEXSHAPE_UL_LatticeList",

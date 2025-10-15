@@ -39,19 +39,19 @@ class FLEXSHAPE_PT_surface_deform(bpy.types.Panel):
         )
         surface_deform_box.operator(
             "flexshape.add_surface_deform",
-            text="Add Surface Deform To Selection",
+            text="Add Surface Deform to Selection",
             icon="ADD",
             emboss=True,
         )
         surface_deform_box.operator(
             "flexshape.remove_surface_deform",
-            text="Remove From Selection",
+            text="Remove from Selection",
             icon="REMOVE",
             emboss=True,
         )
 
         surface_deform_box.label(
-            text="Save Surface Deform To Shape Key", icon="SHAPEKEY_DATA"
+            text="Save Surface Deform to Shapekey", icon="SHAPEKEY_DATA"
         )
         surface_deform_box.prop(
             context.scene,
@@ -69,7 +69,7 @@ class FLEXSHAPE_PT_surface_deform(bpy.types.Panel):
         )
         surface_deform_box.operator(
             "flexshape.surface_deform_save_as_shapekey",
-            text="Save As Shape Key",
+            text="Save as Shapekey",
             icon="SHAPEKEY_DATA",
             emboss=True,
         )
@@ -100,7 +100,7 @@ class FLEXSHAPE_PT_surface_deform(bpy.types.Panel):
         )
         surface_deform_box.operator(
             "flexshape.surface_deform_mass_save",
-            text="Save Selected Shapekeys To Selection",
+            text="Save Selected Shapekeys to Selection",
             icon="PLAY",
             emboss=True,
         )

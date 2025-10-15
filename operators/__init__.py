@@ -29,8 +29,8 @@ from . import (
     lattice_list_operators,
     surface_deform_operators,
     surface_deform_list_operators,
-    shapekey_revert_operators,
-    shapekey_revert_list_operators,
+    # shapekey_revert_operators,
+    # shapekey_revert_list_operators,
     utils_operators,
 )
 
@@ -42,8 +42,8 @@ operators = (
     lattice_list_operators,
     surface_deform_operators,
     surface_deform_list_operators,
-    shapekey_revert_operators,
-    shapekey_revert_list_operators,
+    # shapekey_revert_operators,
+    # shapekey_revert_list_operators,
     utils_operators,
 )
 

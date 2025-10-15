@@ -54,7 +54,7 @@ class FLEXSHAPE_OT_SurfaceDeformMeshSelectionOperatorBase(
         source_surface_deform = context.scene.flexshape_surface_deform_source
 
         if source_surface_deform is None:
-            self.report({"ERROR"}, "Source Surface Deform was not found")
+            self.report({"ERROR"}, "Surface Deform Source Mesh was not found")
             return {"CANCELLED"}
 
         if source_surface_deform in mesh_selection:
@@ -121,9 +121,9 @@ class FLEXSHAPE_OT_SurfaceDeformSaveAsShapekey(FLEXSHAPE_OT_MeshSelectionOperato
             if not result:
                 self.report(
                     {"WARNING"},
-                    "Failed to save shapekey for one or more objects",
+                    "Failed to save Shapekey for one or more objects",
                 )
-                print(f"Failed to save shapekey for {obj.name}")
+                print(f"Failed to save Shapekey for {obj.name}")
 
     def process_objects(self, context, mesh_selection):
         shapekey_name = context.scene.flexshape_surface_deform_shapekey_name
@@ -152,8 +152,8 @@ class FLEXSHAPE_OT_SurfaceDeformMassSave(
     FLEXSHAPE_OT_SurfaceDeformMeshSelectionOperatorBase
 ):
     bl_idname = "flexshape.surface_deform_mass_save"
-    bl_label = "Mass Save Shape Key"
-    bl_description = "For Each In List: Add Surface Deform -> Set Shapekey on Source -> Save As Shape Key"
+    bl_label = "Mass Save Shapekey"
+    bl_description = "For Each In List: Add Surface Deform -> Set Shapekey on Source -> Save as Shapekey"
 
     # noinspection PyMethodMayBeStatic
     def process_meshes(self, context, mesh_selection, source_surface_deform):

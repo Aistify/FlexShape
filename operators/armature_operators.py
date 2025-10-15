@@ -103,7 +103,7 @@ class FLEXSHAPE_OT_ArmatureOperatorBase(bpy.types.Operator):
         source_armature = context.scene.flexshape_armature_source
 
         if self.requires_source and source_armature is None:
-            self.report({"ERROR"}, "No Source Armature Set")
+            self.report({"ERROR"}, "No Source Armature set")
             return {"CANCELLED"}
 
         armature_selection = [
@@ -111,7 +111,7 @@ class FLEXSHAPE_OT_ArmatureOperatorBase(bpy.types.Operator):
         ]
 
         if len(armature_selection) == 0:
-            self.report({"ERROR"}, "No Armatures Selected")
+            self.report({"ERROR"}, "No Armatures selected")
             return {"CANCELLED"}
 
         self.process_armatures(context, source_armature, armature_selection)
@@ -125,7 +125,7 @@ class FLEXSHAPE_OT_ArmatureOperatorBase(bpy.types.Operator):
 class FLEXSHAPE_OT_CopyPoseRelations(FLEXSHAPE_OT_ArmatureOperatorBase):
     bl_idname = "flexshape.copy_pose_relations"
     bl_label = "Copy Pose Relations"
-    bl_description = "Copy Pose Relations From Source To Selected Armatures"
+    bl_description = "Copy Pose Relations from Source to Selected Armatures"
 
     requires_source = True
 
@@ -139,7 +139,7 @@ class FLEXSHAPE_OT_CopyPoseRelations(FLEXSHAPE_OT_ArmatureOperatorBase):
 class FLEXSHAPE_OT_CopyPoseTransforms(FLEXSHAPE_OT_ArmatureOperatorBase):
     bl_idname = "flexshape.copy_pose_transforms"
     bl_label = "Copy Pose Transforms"
-    bl_description = "Copy Pose Transforms From Source To Selected Armatures"
+    bl_description = "Copy Pose Transforms from Source to Selected Armatures"
 
     requires_source = True
 
@@ -153,7 +153,7 @@ class FLEXSHAPE_OT_CopyPoseTransforms(FLEXSHAPE_OT_ArmatureOperatorBase):
 class FLEXSHAPE_OT_ClearPoseTransforms(FLEXSHAPE_OT_ArmatureOperatorBase):
     bl_idname = "flexshape.clear_pose_transforms"
     bl_label = "Clear Pose Transforms"
-    bl_description = "Clear Pose Transforms From Selected Armatures"
+    bl_description = "Clear Pose Transforms from Selected Armatures"
 
     requires_source = False
 
@@ -217,8 +217,8 @@ class FLEXSHAPE_OT_SaveArmatureDeformAsShapekey(bpy.types.Operator):
 # noinspection PyPep8Naming
 class FLEXSHAPE_OT_ArmatureQuickSave(FLEXSHAPE_OT_ArmatureOperatorBase):
     bl_idname = "flexshape.armature_quick_save"
-    bl_label = "Quick Save Shape Key"
-    bl_description = "Copy Relations -> Copy Transforms -> Save As Shape Key -> Clear Transforms For Selected Armatures"
+    bl_label = "Quick Save Shapekey"
+    bl_description = "Copy Relations -> Copy Transforms -> Save as Shapekey -> Clear Transforms for Selected Armatures"
 
     requires_source = True
 
@@ -234,8 +234,8 @@ class FLEXSHAPE_OT_ArmatureQuickSave(FLEXSHAPE_OT_ArmatureOperatorBase):
 # noinspection PyPep8Naming
 class FLEXSHAPE_OT_ArmatureMassSave(FLEXSHAPE_OT_ArmatureOperatorBase):
     bl_idname = "flexshape.armature_mass_save"
-    bl_label = "Mass Save Shape Key"
-    bl_description = "For Each In List: Copy Relations -> Copy Transforms -> Save As Shape Key -> Clear Transforms For Selected Armatures"
+    bl_label = "Mass Save Shapekey"
+    bl_description = "For Each in List: Copy Relations -> Copy Transforms -> Save as Shapekey -> Clear Transforms for Selected Armatures"
 
     requires_source = False
 
@@ -254,9 +254,9 @@ class FLEXSHAPE_OT_ArmatureMassSave(FLEXSHAPE_OT_ArmatureOperatorBase):
             if not result:
                 self.report(
                     {"WARNING"},
-                    f"Failed to save shapekey for one or more armatures sources",
+                    f"Failed to save Shapekey for one or more Armatures Sources",
                 )
-                print(f"Failed to save shapekey for {armature_list_item.armature.name}")
+                print(f"Failed to save Shapekey for {armature_list_item.armature.name}")
 
 
 classes = (

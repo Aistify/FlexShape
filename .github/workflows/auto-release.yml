@@ -10,35 +10,42 @@ jobs:
     permissions:
       contents: write
     steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    - name: Get version
-      id: version
-      run: |
-        latest=$(git tag -l "v1.*" | sort -V | tail -n1)
-        if [ -z "$latest" ]; then
-          tag="v1.0"
-          minor=0
-        else
-          minor=$(echo $latest | sed 's/v1\.//' | sed 's/^0*//')
-          [ -z "$minor" ] && minor=0
-          minor=$((minor + 1))
-          [ $minor -lt 10 ] && tag="v1.0$minor" || tag="v1.$minor"
-        fi
-        echo "tag=$tag" >> $GITHUB_OUTPUT
-        echo "minor=$minor" >> $GITHUB_OUTPUT
-        
-        sed -i "s/\"version\": ([^)]*)/\"version\": (1, $minor, 0)/" __init__.py
+      - name: Get version
+        id: version
+        run: |
+          latest=$(git tag -l "v1.*" | sort -V | tail -n1)
+          if [ -z "$latest" ]; then
+            tag="v1.0"
+            minor=0
+          else
+            minor=$(echo $latest | sed 's/v1\.//' | sed 's/^0*//')
+            [ -z "$minor" ] && minor=0
+            minor=$((minor + 1))
+            [ $minor -lt 10 ] && tag="v1.0$minor" || tag="v1.$minor"
+          fi
+          echo "tag=$tag" >> $GITHUB_OUTPUT
+          echo "minor=$minor" >> $GITHUB_OUTPUT
+          
+          sed -i "s/\"version\": ([^)]*)/\"version\": (1, $minor, 0)/" __init__.py
 
-    - uses: thedoctor0/zip-release@0.7.5
-      with:
-        filename: FlexShape-${{ steps.version.outputs.tag }}.zip
-        exclusions: '*.git* node_modules/* .github/*'
+      - name: Prepare release structure
+        run: |
+          mkdir -p release/FlexShape
+          rsync -av --exclude='.github' --exclude='.venvP13' ./ release/FlexShape/
 
-    - uses: ncipollo/release-action@v1.12.0
-      with:
-        tag: ${{ steps.version.outputs.tag }}
-        name: FlexShape ${{ steps.version.outputs.tag }}
-        artifacts: FlexShape-${{ steps.version.outputs.tag }}.zip
+      - uses: thedoctor0/zip-release@0.7.5
+        with:
+          type: 'zip'
+          filename: FlexShape-${{ steps.version.outputs.tag }}.zip
+          directory: release
+          path: FlexShape
+
+      - uses: ncipollo/release-action@v1.12.0
+        with:
+          tag: ${{ steps.version.outputs.tag }}
+          name: FlexShape ${{ steps.version.outputs.tag }}
+          artifacts: release/FlexShape-${{ steps.version.outputs.tag }}.zip

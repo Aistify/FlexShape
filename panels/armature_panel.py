@@ -27,13 +27,13 @@ class FLEXSHAPE_PT_armature(bpy.types.Panel):
         armature_box.label(text="Armature Operations", icon="POSE_HLT")
         armature_box.operator(
             "flexshape.copy_pose_relations",
-            text="Copy Relations To Selection",
+            text="Copy Relations to Selection",
             icon="BONE_DATA",
             emboss=True,
         )
         armature_box.operator(
             "flexshape.copy_pose_transforms",
-            text="Copy Transforms To Selection",
+            text="Copy Transforms to Selection",
             icon="MOD_DATA_TRANSFER",
             emboss=True,
         )
@@ -44,7 +44,7 @@ class FLEXSHAPE_PT_armature(bpy.types.Panel):
             emboss=True,
         )
 
-        armature_box.label(text="Armature To Shape Key", icon="SHAPEKEY_DATA")
+        armature_box.label(text="Armature to Shapekey", icon="SHAPEKEY_DATA")
         armature_box.prop(
             context.scene,
             "flexshape_armature_shapekey_name",
@@ -71,7 +71,7 @@ class FLEXSHAPE_PT_armature(bpy.types.Panel):
             emboss=True,
         )
 
-        armature_box.label(text="Mass Armature To Shape Keys", icon="DOCUMENTS")
+        armature_box.label(text="Mass Armature to Shapekeys", icon="DOCUMENTS")
         row = armature_box.row()
         row.template_list(
             "FLEXSHAPE_UL_ArmatureList",

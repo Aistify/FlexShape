@@ -59,7 +59,7 @@ class FLEXSHAPE_OT_AddLattice(FLEXSHAPE_OT_MeshSelectionOperatorBase):
         source_lattice = context.scene.flexshape_lattice_source
 
         if source_lattice is None:
-            self.report({"ERROR"}, "No Source Lattice Set")
+            self.report({"ERROR"}, "No Source Lattice set")
             return {"CANCELLED"}
 
         for obj in mesh_selection:
@@ -101,9 +101,9 @@ class FLEXSHAPE_OT_LatticeSaveAsShapekey(FLEXSHAPE_OT_MeshSelectionOperatorBase)
             if not result:
                 self.report(
                     {"WARNING"},
-                    "Failed to save shapekey for one or more objects",
+                    "Failed to save Shapekey for one or more objects",
                 )
-                print(f"Failed to save shapekey for {obj.name}")
+                print(f"Failed to save Shapekey for {obj.name}")
 
     def process_objects(self, context, mesh_selection):
         cleanup_modifier = context.scene.flexshape_lattice_auto_remove
@@ -132,8 +132,8 @@ class FLEXSHAPE_OT_LatticeSaveAsShapekey(FLEXSHAPE_OT_MeshSelectionOperatorBase)
 # noinspection PyPep8Naming
 class FLEXSHAPE_OT_LatticeQuickSave(FLEXSHAPE_OT_MeshSelectionOperatorBase):
     bl_idname = "flexshape.lattice_quick_save"
-    bl_label = "Quick Save Shape Key"
-    bl_description = "Add Lattice -> Save As Shape Key"
+    bl_label = "Quick Save Shapekey"
+    bl_description = "Add Lattice -> Save as Shapekey"
 
     # noinspection PyMethodMayBeStatic
     def process_objects(self, context, mesh_selection):
@@ -152,9 +152,9 @@ class FLEXSHAPE_OT_LatticeQuickSave(FLEXSHAPE_OT_MeshSelectionOperatorBase):
             if not result:
                 self.report(
                     {"WARNING"},
-                    "Failed to save shapekey for one or more objects",
+                    "Failed to save Shapekey for one or more objects",
                 )
-                print(f"Failed to save shapekey for {obj.name}")
+                print(f"Failed to save Shapekey for {obj.name}")
 
         return {"FINISHED"}
 
@@ -162,8 +162,8 @@ class FLEXSHAPE_OT_LatticeQuickSave(FLEXSHAPE_OT_MeshSelectionOperatorBase):
 # noinspection PyPep8Naming
 class FLEXSHAPE_OT_LatticeMassSave(FLEXSHAPE_OT_MeshSelectionOperatorBase):
     bl_idname = "flexshape.lattice_mass_save"
-    bl_label = "Mass Save Shape Key"
-    bl_description = "For Each In List: Add Lattice -> Save As Shape Key"
+    bl_label = "Mass Save Shapekey"
+    bl_description = "For Each in List: Add Lattice -> Save as Shapekey"
 
     # noinspection PyMethodMayBeStatic
     def process_objects(self, context, mesh_selection):
@@ -180,9 +180,9 @@ class FLEXSHAPE_OT_LatticeMassSave(FLEXSHAPE_OT_MeshSelectionOperatorBase):
                 if not result:
                     self.report(
                         {"WARNING"},
-                        "Failed to save shapekey for one or more objects",
+                        "Failed to save Shapekey for one or more objects",
                     )
-                    print(f"Failed to save shapekey for {obj.name}")
+                    print(f"Failed to save Shapekey for {obj.name}")
 
         return {"FINISHED"}
 
