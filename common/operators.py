@@ -25,6 +25,8 @@ class FLEXSHAPE_OT_SelectJsonFile(bpy.types.Operator):
 
 # noinspection PyPep8Naming
 class FLEXSHAPE_OT_MeshSelectionOperatorBase(bpy.types.Operator):
+    bl_idname = "flexshape.mesh_selection_operator_base"
+    bl_label = "Mesh Selection Operator"
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self, context):
