@@ -173,8 +173,9 @@ class FLEXSHAPE_OT_SaveArmatureDeformAsShapekey(bpy.types.Operator):
     # noinspection PyTypeHints
     use_selection: bpy.props.BoolProperty(
         name="Use Selection",
-        description="Process only selected mesh objects?",
+        description="Process only selected mesh objects",
         default=True,
+        options={'HIDDEN'}
     )
 
     # noinspection PyMethodMayBeStatic

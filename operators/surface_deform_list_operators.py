@@ -20,11 +20,11 @@ class FLEXSHAPE_OT_LoadSourceShapekeys(bpy.types.Operator):
         source = context.scene.flexshape_surface_deform_source
 
         if source is None or source.type != "MESH":
-            self.report({"WARNING"}, "No valid Surface Deform Source Mesh selected")
+            self.report({"ERROR"}, "No Surface Deform Source Mesh set")
             return {"CANCELLED"}
 
         if not source.data.shape_keys:
-            self.report({"WARNING"}, "Surface Deform Source Mesh has no Shapekey")
+            self.report({"ERROR"}, "Surface Deform Source Mesh has no Shapekey")
             return {"CANCELLED"}
 
         context.scene.flexshape_surface_deform_shapekey_list.clear()

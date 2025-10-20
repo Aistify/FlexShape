@@ -3,7 +3,7 @@
 bl_info = {
     "name": "FlexShape",
     "author": "Aistify",
-    "description": "v1.0 Release",
+    "description": "Blender utility plugin to create armature, lattice and surface deformation shapekeys across multiple meshes at once.",
     "blender": (4, 2, 0),
     "version": (1, 0, 0),
     "location": "@Aistify",
