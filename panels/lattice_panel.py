@@ -61,7 +61,7 @@ class FLEXSHAPE_PT_lattice(bpy.types.Panel):
         )
         lattice_box.operator(
             "flexshape.lattice_quick_save",
-            text="Quick Save (Full Process)",
+            text="Quick Save",
             icon="PLAY",
             emboss=True,
         )
@@ -89,7 +89,7 @@ class FLEXSHAPE_PT_lattice(bpy.types.Panel):
 
         lattice_box.operator(
             "flexshape.lattice_mass_save",
-            text="Quick Save List (Full Process)",
+            text="Quick Save List",
             icon="PLAY",
             emboss=True,
         )
