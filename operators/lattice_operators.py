@@ -145,9 +145,7 @@ class FLEXSHAPE_OT_LatticeQuickSave(FLEXSHAPE_OT_MeshSelectionOperatorBase):
             return {"CANCELLED"}
 
         for obj in mesh_selection:
-            result = quick_save_lattice_as_shapekey(
-                obj, source_lattice.lattice, shapekey_name
-            )
+            result = quick_save_lattice_as_shapekey(obj, source_lattice, shapekey_name)
 
             if not result:
                 self.report(
